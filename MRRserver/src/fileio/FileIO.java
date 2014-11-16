@@ -13,7 +13,7 @@ public class FileIO
 	private static ObjectInputStream	is;
 	private static ObjectOutputStream	os;
 	
-	public static ArrayList<Account> loadData() throws Exception
+	public static ArrayList<Account> loadData() throws IOException, ClassNotFoundException
 	{
 		ArrayList<Account> list = null;
 		is = new ObjectInputStream(new FileInputStream(DATALOC));
@@ -22,14 +22,14 @@ public class FileIO
 		return list;
 	}
 
-	public static void saveData(ArrayList<Account> list) throws Exception
+	public static void saveData(ArrayList<Account> list) throws IOException
 	{
 		os = new ObjectOutputStream(new FileOutputStream(DATALOC));
 		os.writeObject(list);
 		os.close();
 	}
 	
-	public static ArrayList<Account> loadRegisters() throws Exception
+	public static ArrayList<Account> loadRegisters() throws IOException, ClassNotFoundException
 	{
 		ArrayList<Account> list = null;
 		is = new ObjectInputStream(new FileInputStream(REGISTERSLOC));
@@ -38,7 +38,7 @@ public class FileIO
 		return list;
 	}
 
-	public static void saveRegisters(ArrayList<Account> list) throws Exception
+	public static void saveRegisters(ArrayList<Account> list) throws IOException
 	{
 		os = new ObjectOutputStream(new FileOutputStream(REGISTERSLOC));
 		os.writeObject(list);
