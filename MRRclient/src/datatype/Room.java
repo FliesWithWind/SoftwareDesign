@@ -5,6 +5,11 @@ import java.util.ArrayList;
 
 public class Room implements Serializable
 {
+	public static final transient int SEOUL 	= 0;
+	public static final transient int DAEJEON 	= 1;
+	public static final transient int DAEGU 	= 2;
+	public static final transient int JEONJU 	= 3;
+	
 	private Account					owner;
 	private ArrayList<Reservation>	reservations;
 	

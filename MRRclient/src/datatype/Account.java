@@ -5,6 +5,11 @@ import java.util.ArrayList;
 
 public class Account implements Serializable
 {
+	public static final transient int UNSIGNED 	= 0;
+	public static final transient int USER	 	= 1;
+	public static final transient int STAFF		= 2;
+	public static final transient int MANAGER 	= 3;
+	
 	private ArrayList<Reservation>	myreservations;
 	private ArrayList<Room>			myrooms;
 	
