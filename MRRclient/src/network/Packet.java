@@ -10,7 +10,7 @@ public class Packet implements Serializable
 	//
 	/************************************************************************************/
 	
-	private int 	flag;	// which message? (to tell the why of parsing packet)
+	private int 	flag;	// which message? (to tell the way of parsing packet)
 	private String	id;		// to validate
 	private String	pw;		// to validate
 	private Object	data;	// data contained in message
