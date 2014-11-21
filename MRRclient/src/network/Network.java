@@ -42,10 +42,11 @@ public class Network implements Runnable
 		
 		try
 		{	
-			packet = receive();		// read from server
-			disconnect();			// send EOF
+			packet = receive();						// read from server
+			packetprocessor.process(packet);		// process the packet
+			disconnect();							// send EOF
 			
-			while((packet = receive()) != null)		// when non EOF
+			while((packet = receive()) != null)		// for graceful close
 				packetprocessor.process(packet);	// process the packet
 			
 			closeStreams();	// disconnected : notify and close streams
@@ -66,18 +67,9 @@ public class Network implements Runnable
 	// sends packet to server and runs packet receiver thread
 	public void send(Packet packet) throws IOException
 	{
-		try
-		{
-			connect(IP, PORT);			// connect		
-			os.writeObject(packet);		// send message
-			(new Thread(this)).start(); // run receiver
-		}
-		catch(IOException e)
-		{
-			e.printStackTrace();
-			packetprocessor.process(null);
-			// send EOF to Packet Processor when connection error
-		}
+		connect(IP, PORT);			// connect		
+		os.writeObject(packet);		// send message
+		(new Thread(this)).start(); // run receiver
 	}
 	
 	private void connect(String ip, int port) throws IOException

@@ -4,6 +4,11 @@ import java.io.Serializable;
 
 public class Packet implements Serializable
 {
+	private int 	flag;	// which message? (to tell the way to parsing packet)
+	private String	id;		// to validate
+	private String	pw;		// to validate
+	private Object	data;	// data contained in message
+	
 	public static final transient int
 	/******************************* Flag List - Client Side *******************************/
 	// Simple Messages
@@ -52,12 +57,6 @@ public class Packet implements Serializable
 	_SEARCH_SEC			= 102,	// These data are secondary searched result
 	_QUERY_RSRVS		= 105;	// List of reservations on a certain room
 	/***************************************************************************************/
-	
-	private int 	flag;	// which message? (to tell the way to parsing packet)
-	private String	id;		// to validate
-	private String	pw;		// to validate
-	private Object	data;	// data contained in message
-	
 	
 	public Packet(int flag, String id, String pw, Object data)
 	{

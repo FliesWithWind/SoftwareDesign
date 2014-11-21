@@ -12,7 +12,7 @@ public class Packet implements Serializable
 	public static final transient int
 	/******************************* Flag List - Client Side *******************************/
 	// Simple Messages
-	LOGIN 				= 0,	// Attempt to login
+	LOGIN 				= 0,	// Request to validate ID-PW
 	// Account
 	MY_ACNT				= 10,	// View my account properties
 	REGISTER 			= 11,	// Request to register
