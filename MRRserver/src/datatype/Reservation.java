@@ -9,14 +9,16 @@ public class Reservation implements Serializable
 	
 	private long	date;		//	getTime() / 24 * 60 * 60 * 1000
 	private float	rentcost;
+	private boolean	reqcancel;	// Is requested by the client to be canceled?
 	
 	
-	public Reservation(Account client, Room room, long date, float rentcost)
+	public Reservation(Account client, Room room, long date, float rentcost, boolean reqcancel)
 	{
 		setClient(client);
 		setRoom(room);
 		setDate(date);
 		setRentcost(rentcost);
+		setReqcancel(reqcancel);
 	}
 	
 	public Account getClient()
@@ -57,5 +59,15 @@ public class Reservation implements Serializable
 	public void setRentcost(float rentcost)
 	{
 		this.rentcost = rentcost;
+	}
+	
+	public boolean isReqcancel()
+	{
+		return reqcancel;
+	}
+
+	public void setReqcancel(boolean reqcancel)
+	{
+		this.reqcancel = reqcancel;
 	}
 }

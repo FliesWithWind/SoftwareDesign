@@ -1,5 +1,7 @@
 package control;
 
+import ui.*;
+
 import java.io.IOException;
 
 import network.*;
@@ -16,7 +18,7 @@ public class PacketBuilder
 		return self;											//
 	}/////////////////////////////////////////////////////////////
 	
-	// private UIs uis; ***to be implemented*** has UI object
+	// private UIs mainframe; ***to be implemented*** has UI object
 	private Network network;
 	
 	private String id;
@@ -40,8 +42,8 @@ public class PacketBuilder
 		}
 		catch(IOException e)
 		{
-			// ***to be implemented*** calls UI's dialogue()
-			// ***to be implemented*** calls UI's unblock()
+			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
+			// mainframe.unblock();
 		}
 	}
 
@@ -54,8 +56,8 @@ public class PacketBuilder
 		}
 		catch(IOException e)
 		{
-			// ***to be implemented*** calls UI's dialogue()
-			// ***to be implemented*** calls UI's unblock()
+			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
+			// mainframe.unblock();
 		}
 	}
 
@@ -68,8 +70,8 @@ public class PacketBuilder
 		}
 		catch(IOException e)
 		{
-			// ***to be implemented*** calls UI's dialogue()
-			// ***to be implemented*** calls UI's unblock()
+			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
+			// mainframe.unblock();
 		}
 	}
 
@@ -82,8 +84,8 @@ public class PacketBuilder
 		}
 		catch(IOException e)
 		{
-			// ***to be implemented*** calls UI's dialogue()
-			// ***to be implemented*** calls UI's unblock()
+			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
+			// mainframe.unblock();
 		}
 	}
 
@@ -96,8 +98,8 @@ public class PacketBuilder
 		}
 		catch(IOException e)
 		{
-			// ***to be implemented*** calls UI's dialogue()
-			// ***to be implemented*** calls UI's unblock()
+			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
+			// mainframe.unblock();
 		}
 	}
 
@@ -111,8 +113,8 @@ public class PacketBuilder
 		}
 		catch(IOException e)
 		{
-			// ***to be implemented*** calls UI's dialogue()
-			// ***to be implemented*** calls UI's unblock()
+			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
+			// mainframe.unblock();
 		}
 	}
 
@@ -125,8 +127,8 @@ public class PacketBuilder
 		}
 		catch(IOException e)
 		{
-			// ***to be implemented*** calls UI's dialogue()
-			// ***to be implemented*** calls UI's unblock()
+			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
+			// mainframe.unblock();
 		}
 	}
 
@@ -139,8 +141,8 @@ public class PacketBuilder
 		}
 		catch(IOException e)
 		{
-			// ***to be implemented*** calls UI's dialogue()
-			// ***to be implemented*** calls UI's unblock()
+			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
+			// mainframe.unblock();
 		}
 	}
 
@@ -153,8 +155,8 @@ public class PacketBuilder
 		}
 		catch(IOException e)
 		{
-			// ***to be implemented*** calls UI's dialogue()
-			// ***to be implemented*** calls UI's unblock()
+			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
+			// mainframe.unblock();
 		}
 	}
 
@@ -169,8 +171,8 @@ public class PacketBuilder
 		}
 		catch(IOException e)
 		{
-			// ***to be implemented*** calls UI's dialogue()
-			// ***to be implemented*** calls UI's unblock()
+			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
+			// mainframe.unblock();
 		}
 	}
 
@@ -185,8 +187,8 @@ public class PacketBuilder
 		}
 		catch(IOException e)
 		{
-			// ***to be implemented*** calls UI's dialogue()
-			// ***to be implemented*** calls UI's unblock()
+			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
+			// mainframe.unblock();
 		}
 	}
 
@@ -200,8 +202,8 @@ public class PacketBuilder
 		}
 		catch(IOException e)
 		{
-			// ***to be implemented*** calls UI's dialogue()
-			// ***to be implemented*** calls UI's unblock()
+			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
+			// mainframe.unblock();
 		}
 	}
 
@@ -216,8 +218,8 @@ public class PacketBuilder
 		}
 		catch(IOException e)
 		{
-			// ***to be implemented*** calls UI's dialogue()
-			// ***to be implemented*** calls UI's unblock()
+			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
+			// mainframe.unblock();
 		}
 	}
 
@@ -232,8 +234,8 @@ public class PacketBuilder
 		}
 		catch(IOException e)
 		{
-			// ***to be implemented*** calls UI's dialogue()
-			// ***to be implemented*** calls UI's unblock()
+			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
+			// mainframe.unblock();
 		}
 	}
 
@@ -246,8 +248,8 @@ public class PacketBuilder
 		}
 		catch(IOException e)
 		{
-			// ***to be implemented*** calls UI's dialogue()
-			// ***to be implemented*** calls UI's unblock()
+			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
+			// mainframe.unblock();
 		}
 	}
 
@@ -260,8 +262,8 @@ public class PacketBuilder
 		}
 		catch(IOException e)
 		{
-			// ***to be implemented*** calls UI's dialogue()
-			// ***to be implemented*** calls UI's unblock()
+			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
+			// mainframe.unblock();
 		}
 	}
 
@@ -274,8 +276,8 @@ public class PacketBuilder
 		}
 		catch(IOException e)
 		{
-			// ***to be implemented*** calls UI's dialogue()
-			// ***to be implemented*** calls UI's unblock()
+			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
+			// mainframe.unblock();
 		}
 	}
 
@@ -289,8 +291,8 @@ public class PacketBuilder
 		}
 		catch(IOException e)
 		{
-			// ***to be implemented*** calls UI's dialogue()
-			// ***to be implemented*** calls UI's unblock()
+			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
+			// mainframe.unblock();
 		}
 	}
 
@@ -305,8 +307,8 @@ public class PacketBuilder
 		}
 		catch(IOException e)
 		{
-			// ***to be implemented*** calls UI's dialogue()
-			// ***to be implemented*** calls UI's unblock()
+			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
+			// mainframe.unblock();
 		}
 	}
 	
