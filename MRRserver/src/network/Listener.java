@@ -21,6 +21,7 @@ public class Listener implements Runnable
 	{
 		// create listening socket
 		System.out.println("Creating Listening Socket...");
+		
 		try
 		{
 			ss = new ServerSocket(PORT);
@@ -56,7 +57,6 @@ public class Listener implements Runnable
 				return;
 			}
 		}
-			
 	}
 	
 	// close server

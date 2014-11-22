@@ -27,6 +27,8 @@ public class PacketProcessor
 	
 	public void process(Packet packet)
 	{
+		System.out.println((String)packet.getData()); //  For test
+		
 		switch(packet.getFlag())
 		{
 		case Packet._ACCEPTED:

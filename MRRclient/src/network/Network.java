@@ -48,19 +48,28 @@ public class Network implements Runnable
 			
 			while((packet = receive()) != null)		// for graceful close
 				packetprocessor.process(packet);	// process the packet
-			
-			closeStreams();	// disconnected : notify and close streams
+		}
+		catch(EOFException e)
+		{
+			System.out.println("Got EOF");
 		}
 		catch(ClassNotFoundException e)
 		{
 			System.out.println("Invalid packet form");
 			e.printStackTrace();
-			packet = null;
 		}
 		catch(IOException e)
 		{
 			e.printStackTrace();
-			packet = null;
+		}
+
+		try
+		{
+			closeStreams();	// disconnected : notify and close streams
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
 		}
 	}
 	
@@ -93,6 +102,7 @@ public class Network implements Runnable
 	private void disconnect() throws IOException
 	{
 		client.shutdownInput();
+		System.out.println("Disconnecting...");
 	}
 	
 	private void closeStreams() throws IOException

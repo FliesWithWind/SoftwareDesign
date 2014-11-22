@@ -40,6 +40,11 @@ public class Network implements Runnable
 				// process packet in processor and response to client
 				os.writeObject(processor.process(packet));
 			}
+			catch(EOFException e)
+			{
+				System.out.println("Got EOF");
+				break;
+			}
 			catch(ClassNotFoundException e)
 			{
 				System.out.println("Invalid packet form");
