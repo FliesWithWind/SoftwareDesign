@@ -28,8 +28,8 @@ public class Packet implements Serializable
 	REQ_CANCEL_RSRV		= 34,	// Request to cancel a certain reservation			(User)
 	// Reservation - Staff
 	OPEN_RSRV			= 41,	// Open a room in a certain date to be leased		(Staff)
-	CLOSE_RSRV			= 43,	// Close a room for non to be leased				(Staff)
-	CANCEL_RERV			= 44,	// Cancel a reservation requested to be canceled	(Staff)
+	CLOSE_RSRV			= 43,	// Close a room not to be leased					(Staff)
+	CANCEL_RSRV			= 44,	// Cancel a reservation requested to be canceled	(Staff)
 	// Managing registration
 	QUERY_REGS			= 51,	// Query for requests for registration				(Manager)
 	ACCEPT_REG			= 52,	// Accept registration								(Manager)

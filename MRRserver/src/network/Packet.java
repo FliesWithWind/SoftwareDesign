@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class Packet implements Serializable
 {
-	private int 	flag;	// which message? (to tell the way to parsing packet)
+	private int 	flag;	// which message? (to tell the way of parsing packet, see below)
 	private String	id;		// to validate
 	private String	pw;		// to validate
 	private Object	data;	// data contained in message
@@ -12,7 +12,7 @@ public class Packet implements Serializable
 	public static final transient int
 	/******************************* Flag List - Client Side *******************************/
 	// Simple Messages
-	LOGIN 				= 0,	// Attempt to login
+	LOGIN 				= 0,	// Request to validate ID-PW
 	// Account
 	MY_ACNT				= 10,	// View my account properties
 	REGISTER 			= 11,	// Request to register
@@ -28,8 +28,8 @@ public class Packet implements Serializable
 	REQ_CANCEL_RSRV		= 34,	// Request to cancel a certain reservation			(User)
 	// Reservation - Staff
 	OPEN_RSRV			= 41,	// Open a room in a certain date to be leased		(Staff)
-	CLOSE_RSRV			= 43,	// Close a room for non to be leased				(Staff)
-	CANCEL_RERV			= 44,	// Cancel a reservation requested to be canceled	(Staff)
+	CLOSE_RSRV			= 43,	// Close a room not to be leased					(Staff)
+	CANCEL_RSRV			= 44,	// Cancel a reservation requested to be canceled	(Staff)
 	// Managing registration
 	QUERY_REGS			= 51,	// Query for requests for registration				(Manager)
 	ACCEPT_REG			= 52,	// Accept registration								(Manager)
@@ -57,7 +57,7 @@ public class Packet implements Serializable
 	_SEARCH_SEC			= 102,	// These data are secondary searched result
 	_QUERY_RSRVS		= 105;	// List of reservations on a certain room
 	/***************************************************************************************/
-	
+		
 	public Packet(int flag, String id, String pw, Object data)
 	{
 		setFlag(flag);
@@ -106,3 +106,4 @@ public class Packet implements Serializable
 		this.data = data;
 	}
 }
+
