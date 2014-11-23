@@ -19,6 +19,18 @@ public class Room implements Serializable
 	private int		maxcapacity;
 	private float	default_rentcost;
 
+	public Room(Account owner,
+			String name, int city, String location, 
+			int maxcapacity, float default_rentcost)
+	{	
+		ArrayList<Reservation> reservations = new ArrayList<Reservation>();
+		setOwner(owner);
+		setName(name);
+		setCity(city);
+		setLocation(location);
+		setMaxcapacity(maxcapacity);
+		setDefault_rentcost(default_rentcost);
+	}
 	
 	public Room(Account owner, ArrayList<Reservation> reservations,
 				String name, int city, String location, 
