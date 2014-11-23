@@ -121,6 +121,24 @@ public class ServerConsole {
 			System.out.println(RoomList.get(i).getName() + " " + RoomList.get(i).getCity() + " " + RoomList.get(i).getMaxcapacity());
 	}
 	
+	private static void saveAccounts() throws FileNotFoundException, IOException{
+		ObjectOutputStream fileOut = new ObjectOutputStream(new FileOutputStream("accounts.xml"));
+		try{
+			fileOut.writeObject(AccountList);
+			fileOut.close();
+		}
+		catch(IOException e){
+			System.out.println("Encountered problem while writign to the file.");
+		}
+	}
+	
+	private static ArrayList<Account> loadAccounts() throws FileNotFoundException, IOException, ClassNotFoundException{
+		ObjectInputStream fileIn = new ObjectInputStream(new FileInputStream("accounts.xml"));
+		ArrayList<Account> list = (ArrayList) fileIn.readObject();
+		fileIn.close();
+		return list;
+	}
+	
 	public static void main(String[] args){
 		AccountList = new ArrayList<Account>();
 		RoomList = new ArrayList<Room>();
@@ -141,6 +159,8 @@ public class ServerConsole {
 			 	System.out.println("create_room <owner_id> <name> <city> <location> <capacity> <rent_cost>");
 			 	System.out.println("list_accounts");
 			 	System.out.println("list_rooms");
+			 	System.out.println("save_accounts");
+			 	System.out.println("load_accounts");
 	        } else if(message.startsWith("create_account"))
 	        	newAccount(message);
 	        else if(message.startsWith("list_accounts"))
@@ -149,6 +169,10 @@ public class ServerConsole {
 	        	newRoom(message);
 	        else if(message.startsWith("list_rooms"))
 	        	listRooms();
+	        else if(message.startsWith("save_accounts"))
+	        	saveAccounts();
+	        else if(message.startsWith("load_accounts"))
+	        	AccountList = loadAccounts();
 	      }
 	    } 
 	    catch (Exception ex) 
