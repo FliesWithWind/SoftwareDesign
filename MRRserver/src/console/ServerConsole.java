@@ -113,12 +113,12 @@ public class ServerConsole {
 	
 	private static void listAccounts(){
 		for(int i=0;i<AccountList.size();i++)
-			System.out.println(AccountList.get(i).getName() + " " + AccountList.get(i).getId() + " " + AccountList.get(i).getPhonenum());
+			System.out.println("Name: " + AccountList.get(i).getName() + "\tID: " + AccountList.get(i).getId() + "\tE-mail: " + AccountList.get(i).getEmail() + "\tPhone number: " + AccountList.get(i).getPhonenum() + "\tUni/Commp: " + AccountList.get(i).getUniv_comp());
 	}
 	
 	private static void listRooms(){
 		for(int i=0;i<RoomList.size();i++)
-			System.out.println(RoomList.get(i).getName() + " " + RoomList.get(i).getCity() + " " + RoomList.get(i).getMaxcapacity());
+			System.out.println("Name: " + RoomList.get(i).getName() + "\tCity: " + RoomList.get(i).getCity() + "\tLocation: " + RoomList.get(i).getLocation() + "\tCapacity: " + RoomList.get(i).getMaxcapacity() + "\tRent Cost: " + RoomList.get(i).getDefault_rentcost());
 	}
 	
 	private static void saveAccounts() throws FileNotFoundException, IOException{
@@ -179,6 +179,8 @@ public class ServerConsole {
 			 	System.out.println("list_rooms");
 			 	System.out.println("save_accounts");
 			 	System.out.println("load_accounts");
+			 	System.out.println("save_rooms");
+			 	System.out.println("load_rooms");
 	        } else if(message.startsWith("create_account"))
 	        	newAccount(message);
 	        else if(message.startsWith("list_accounts"))
