@@ -297,7 +297,7 @@ public class PacketBuilder
 	}
 
 	// Query reservations on a certain room
-	public void searchRooms(String name, long date)
+	public void queryReservations(String name, long date)
 	{
 		String[] inf = {name, Long.toString(date)}; // date to be parsed in server
 		

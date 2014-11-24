@@ -35,6 +35,11 @@ public class PacketProcessor
 			// mainframe.dialogue(0, STR.NOTI_TITLE_ACCEPTED, STR.NOTI_CONTENT_ACCEPTED);
 			break;
 
+		case Packet._LOGIN:
+			// *** to be implemented *** //
+			// Switch to main frame 
+			break;
+
 		case Packet._INVALID_ACNT:
 			// mainframe.dialogue(1, STR.NOTI_TITLE_INVALID_ACNT, STR.NOTI_CONTENT_INVALID_ACNT);
 			break;
@@ -145,7 +150,6 @@ public class PacketProcessor
 				// mainframe.dialogue(1, STR.NOTI_TITLE_NO_RESERVATION, STR.NOTI_CONTENT_NO_RESERVATION);
 			// else mainframe.updateCalendar((ArrayList<Room>) packet.getData()[1]);
 			break;
-			
 		}
 		
 		// mainframe.unblock(); // Unblock UI that is blocked not to get input.

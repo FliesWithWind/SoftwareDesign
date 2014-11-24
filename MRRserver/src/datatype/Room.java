@@ -12,32 +12,22 @@ public class Room implements Serializable
 	
 	private Account					owner;
 	private ArrayList<Reservation>	reservations;
-	
+
+	private String	id;
 	private String	name;
 	private int		city; // Seoul - 0, Daejeon - 1, Daegu - 2, Jeonju - 3
 	private String	location;
 	private int		maxcapacity;
 	private float	default_rentcost;
 
-	public Room(Account owner,
-			String name, int city, String location, 
-			int maxcapacity, float default_rentcost)
-	{	
-		ArrayList<Reservation> reservations = new ArrayList<Reservation>();
-		setOwner(owner);
-		setName(name);
-		setCity(city);
-		setLocation(location);
-		setMaxcapacity(maxcapacity);
-		setDefault_rentcost(default_rentcost);
-	}
 	
 	public Room(Account owner, ArrayList<Reservation> reservations,
-				String name, int city, String location, 
+				String id, String name, int city, String location, 
 				int maxcapacity, float default_rentcost)
 	{
 		setOwner(owner);
 		setReservations(reservations);
+		setId(id);
 		setName(name);
 		setCity(city);
 		setLocation(location);
@@ -63,6 +53,16 @@ public class Room implements Serializable
 	public void setReservations(ArrayList<Reservation> reservations)
 	{
 		this.reservations = reservations;
+	}
+	
+	public String getId()
+	{
+		return id;
+	}
+	
+	public void setId(String id)
+	{
+		this.id = id;
 	}
 	
 	public String getName()

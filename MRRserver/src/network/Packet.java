@@ -40,6 +40,7 @@ public class Packet implements Serializable
 	/******************************* Flag List - Server Side *******************************/
 	/* Simple Messages */
 	_ACCEPTED 			= 0,	// Simple positive (= Yes)
+	_LOGIN				= 1,	// Log in ID-PW is valid
 	_INVALID_ACNT 		= -1,	// Invalid ID-PW
 	_INVALID_ACCESS		= -2,	// Invalid authorization
 	_REJECTED 			= -3,	// Rejected by server control (e.g : request on deleted room)
