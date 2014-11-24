@@ -18,6 +18,7 @@ public class Room implements Serializable
 	private String	location;
 	private int		maxcapacity;
 	private float	default_rentcost;
+	private int 	id; //room id number
 
 	public Room(Account owner,
 			String name, int city, String location, 
