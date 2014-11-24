@@ -79,7 +79,7 @@ public class ServerConsole {
     		System.out.println("[Error] Invalid number of parameters!");
     		return false;
     	} else{
-    		// Debug to check if string is splited correctly
+    		// Debug to check if string is split correctly
     		//for(int i=0;i<cmd.length;i++)
     		//	System.out.println(i + " " + cmd[i]);
     		
@@ -139,6 +139,24 @@ public class ServerConsole {
 		return list;
 	}
 	
+	private static void saveRooms() throws FileNotFoundException, IOException{
+		ObjectOutputStream fileOut = new ObjectOutputStream(new FileOutputStream("rooms.xml"));
+		try{
+			fileOut.writeObject(RoomList);
+			fileOut.close();
+		}
+		catch(IOException e){
+			System.out.println("Encountered problem while writign to the file.");
+		}
+	}
+
+	private static ArrayList<Room> loadRooms() throws FileNotFoundException, IOException, ClassNotFoundException{
+		ObjectInputStream fileIn = new ObjectInputStream(new FileInputStream("rooms.xml"));
+		ArrayList<Room> list = (ArrayList) fileIn.readObject();
+		fileIn.close();
+		return list;
+	}
+	
 	public static void main(String[] args){
 		AccountList = new ArrayList<Account>();
 		RoomList = new ArrayList<Room>();
@@ -173,6 +191,10 @@ public class ServerConsole {
 	        	saveAccounts();
 	        else if(message.startsWith("load_accounts"))
 	        	AccountList = loadAccounts();
+	        else if(message.startsWith("save_rooms"))
+	        	saveRooms();
+	        else if(message.startsWith("load_rooms"))
+	        	RoomList = loadRooms();
 	      }
 	    } 
 	    catch (Exception ex) 
