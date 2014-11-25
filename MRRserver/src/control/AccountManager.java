@@ -1,6 +1,7 @@
 package control;
 
 import java.util.ArrayList;
+
 import datatype.*;
 
 
@@ -14,10 +15,10 @@ public class AccountManager
 		this.registerlist = new ArrayList<Account>();
 	}
 
-	// search account with id
+	/*** search account with id ***/
 	// found		: returns account itself
-	// not found	: return null
-	public Account searchAccount(String id)
+	// not found	: returns null
+	public Account searchAccount(String id) throws Exception
 	{
 		for(Account iter : list) 					// iterates in account list
 			if(iter.getId().equals(id)) return iter;
@@ -25,10 +26,10 @@ public class AccountManager
 		return null; 								// not found
 	}
 	
-	// validates id and pw
+	/*** validates id and pw ***/
 	// invalid, not found	: returns 0
 	// valid				: returns User - 1, Staff - 2, Manager - 3
-	public int validate(String id, String pw)
+	public int validate(String id, String pw) throws Exception
 	{
 		Account client = searchAccount(id);
 		
@@ -36,23 +37,31 @@ public class AccountManager
 		if(client.getPw() == pw) return client.getType();	// valid
 		return 0;											// invalid
 	}
-	
 	/*
 	// add Registration record to registerlist
 	// accepted						: returns 0
 	// rejected by duaccplicated id	: returns 1
 	public int addRegistration(Account inf)		roommanager
+=======
+	/*** add Registration record to register list ***/
+	// accepted										: returns 0
+	// rejected by an invalid property form			: returns 1
+	// rejected by duplicated id in account list	: returns 2
+	// rejected by duplicated id in register list	: returns 3
+	/*public int addRegistration(Account inf) throws Exception
 	{
 		for(Account eacc : registerlist)	// check duplicated id
 			if(e.getId().equals(inf.getId())) return 1;
 		Account client = searchAccount(id);
-		
+		inf.setId(inf.getId().toLowerCase());				// To Lower character string
+		inf.setMyrooms(new ArrayList<Room>());				// Clear room list
+		inf.setMyreservations(new ArrayList<Reservation>());// Clear reservation list
 		if(client == null) return 0;						// not found
 		if(client.getPw() == pw) return client.getType();	// valid
 		return 0;											// invalid
 	}*/
 	
-	public boolean addAccount(Account acc){
+	public boolean addAccount(Account acc) throws Exception{
 		for(Account eacc : registerlist)	// check duplicated id
 			if(eacc.getId().equals(acc.getId())) return false;
 		if(searchAccount(acc.getId())!=null)

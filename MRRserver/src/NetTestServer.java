@@ -4,6 +4,11 @@ import java.util.Scanner;
 
 public class NetTestServer
 {
+
+	/*** To handle server's service to client,
+	 *	 look at control.Processor.process()
+	 */
+	
 	public static void main(String[] args)
 	{
 		String msg;
@@ -15,5 +20,6 @@ public class NetTestServer
 		System.out.println("Server on");
 		
 		while(!(msg = s.nextLine()).equals("q"));
+		
 	}
 }
