@@ -3,13 +3,14 @@ package console;
 import java.io.*;
 import java.util.ArrayList;
 
+import control.*;
 import datatype.Account;
 import datatype.Room;
 import network.*;
 
 public class ServerConsole {	
 	
-	private static ArrayList<Account> AccountList;
+	//private static ArrayList<Account> AccountList;
 	private static ArrayList<Room> RoomList;
 	
 	public ServerConsole(){
@@ -23,7 +24,7 @@ public class ServerConsole {
 	 * @return
 	 */
 	
-	private static Account findAccount(String id){
+	/*private static Account findAccount(String id){
 		Account tmp;
 		for(int i=0;i<AccountList.size();i++){
 			if(AccountList.get(i).getId().equals(id)){
@@ -32,19 +33,14 @@ public class ServerConsole {
 			}
 		}
 		return null;
-	}
+	}*/
 	
-	/**
-	 * Adding new account to AccounList
-	 * @param command
-	 * @return
-	 */
 	
-	private static boolean newAccount(String command){
+	private static Account newAccount(String command){
     	String[] cmd = command.split(" ");	//Split string into parts
     	if(cmd.length!=8){					//Check if command is correct
     		System.out.println("[Error] Invalid number of parameters!");
-    		return false;
+    		return null;
     	} else{
     		int type=0; // get account type value
     		if(cmd[3].equalsIgnoreCase("user"))
@@ -58,22 +54,13 @@ public class ServerConsole {
     		//	System.out.println(i + " " + cmd[i]);
     		
     		Account tmp = new Account(cmd[1],cmd[2],type,cmd[4],cmd[5],cmd[6],cmd[7]);
-    		try {
-    			AccountList.add(tmp);
-    		}
-    		catch (Exception ex){
-    			System.out.println("[Error] Problem occured while adding to the list.");
-    		}
     		System.out.println("New account sucessfully created.");
-    		return true;
+    		return tmp;
     	}
 	}
 	
-	/**
-	 * Add new room to RoomList
-	 */
 	
-	private static boolean newRoom(String command){
+	/*private static boolean newRoom(String command){
     	String[] cmd = command.split(" ");	//Split string into parts
     	if(cmd.length!=7){					//Check if command is correct
     		System.out.println("[Error] Invalid number of parameters!");
@@ -109,14 +96,14 @@ public class ServerConsole {
 	    		return true;
     		}
     	}
+	}*/
+	
+	private static void listAccounts(AccountManager am){
+		for(int i=0;i<am.getRegisterList().size();i++)
+			System.out.println("Name: " + am.getRegisterList().get(i).getName() + "\tID: " + am.getRegisterList().get(i).getId() + "\tE-mail: " + am.getRegisterList().get(i).getEmail() + "\tPhone number: " + am.getRegisterList().get(i).getPhonenum());
 	}
 	
-	private static void listAccounts(){
-		for(int i=0;i<AccountList.size();i++)
-			System.out.println("Name: " + AccountList.get(i).getName() + "\tID: " + AccountList.get(i).getId() + "\tE-mail: " + AccountList.get(i).getEmail() + "\tPhone number: " + AccountList.get(i).getPhonenum() + "\tUni/Commp: " + AccountList.get(i).getUniv_comp());
-	}
-	
-	private static void listRooms(){
+	/*private static void listRooms(){
 		for(int i=0;i<RoomList.size();i++)
 			System.out.println("Name: " + RoomList.get(i).getName() + "\tCity: " + RoomList.get(i).getCity() + "\tLocation: " + RoomList.get(i).getLocation() + "\tCapacity: " + RoomList.get(i).getMaxcapacity() + "\tRent Cost: " + RoomList.get(i).getDefault_rentcost());
 	}
@@ -155,12 +142,17 @@ public class ServerConsole {
 		ArrayList<Room> list = (ArrayList) fileIn.readObject();
 		fileIn.close();
 		return list;
-	}
+	}*/
 	
 	public static void main(String[] args){
-		AccountList = new ArrayList<Account>();
+		Processor processor = new Processor();
+		//AccountManager AM = new AccountManager();
 		RoomList = new ArrayList<Room>();
 		
+		
+		network.Listener net = new network.Listener(processor);
+		(new Thread(net)).start();
+		System.out.println("::::::::Starting the Listener::::::::");		
 		System.out.println(":::::::Starting Server Console:::::::");
 		System.out.println(":::::::Type help for more info:::::::");
 		try
@@ -182,21 +174,21 @@ public class ServerConsole {
 			 	System.out.println("save_rooms");
 			 	System.out.println("load_rooms");
 	        } else if(message.startsWith("create_account"))
-	        	newAccount(message);
+	        	processor.getAM().addAccount(newAccount(message));
 	        else if(message.startsWith("list_accounts"))
-	        	listAccounts();
+	        	listAccounts(processor.getAM());
 	        else if(message.startsWith("create_room"))
-	        	newRoom(message);
+	        	System.out.println("Not implemented yet.");
 	        else if(message.startsWith("list_rooms"))
-	        	listRooms();
+	        	System.out.println("Not implemented yet.");
 	        else if(message.startsWith("save_accounts"))
-	        	saveAccounts();
+	        	System.out.println("Not implemented yet.");
 	        else if(message.startsWith("load_accounts"))
-	        	AccountList = loadAccounts();
+	        	System.out.println("Not implemented yet.");
 	        else if(message.startsWith("save_rooms"))
-	        	saveRooms();
+	        	System.out.println("Not implemented yet.");
 	        else if(message.startsWith("load_rooms"))
-	        	RoomList = loadRooms();
+	        	System.out.println("Not implemented yet.");
 	      }
 	    } 
 	    catch (Exception ex) 

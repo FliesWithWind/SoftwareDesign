@@ -9,6 +9,10 @@ public class AccountManager
 	private ArrayList<Account> list;
 	private	ArrayList<Account> registerlist;
 	
+	public AccountManager(){
+		this.list = new ArrayList<Account>();
+		this.registerlist = new ArrayList<Account>();
+	}
 
 	// search account with id
 	// found		: returns account itself
@@ -36,10 +40,10 @@ public class AccountManager
 	/*
 	// add Registration record to registerlist
 	// accepted						: returns 0
-	// rejected by duplicated id	: returns 1
-	public int addRegistration(Account inf)
+	// rejected by duaccplicated id	: returns 1
+	public int addRegistration(Account inf)		roommanager
 	{
-		for(Account e : registerlist)	// check duplicated id
+		for(Account eacc : registerlist)	// check duplicated id
 			if(e.getId().equals(inf.getId())) return 1;
 		Account client = searchAccount(id);
 		
@@ -47,4 +51,21 @@ public class AccountManager
 		if(client.getPw() == pw) return client.getType();	// valid
 		return 0;											// invalid
 	}*/
+	
+	public boolean addAccount(Account acc){
+		for(Account eacc : registerlist)	// check duplicated id
+			if(eacc.getId().equals(acc.getId())) return false;
+		if(searchAccount(acc.getId())!=null)
+			return false;
+		registerlist.add(acc);
+		return true;
+	}
+	
+	public ArrayList<Account> getRegisterList(){
+		return registerlist;
+	}
+	
+	public ArrayList<Account> getAccountList(){
+		return list;
+	}
 }
