@@ -68,4 +68,41 @@ public class AccountManager
 	public ArrayList<Account> getAccountList(){
 		return list;
 	}
+	
+	public void setRegisterList(ArrayList<Account> input){
+		this.registerlist = input;
+	}
+	
+	public void setAccountList(ArrayList<Account> input){
+		this.list = input;
+	}
+		
+	//Method to move Account if it is accepted. If it does not exist in register list, return false
+	public boolean validateAccount(Account acc){
+		if(registerlist.contains(acc)){
+			list.add(acc);
+			registerlist.remove(acc);
+			return true;
+		}
+		else
+			return false;
+	}
+	
+	public boolean deleteRegistration(Account acc){
+		if(registerlist.contains(acc)){
+			registerlist.remove(acc);
+			return true;
+		}
+		else
+			return false;
+	}
+	
+	public boolean deleteAccount(Account acc){
+		if(registerlist.contains(acc)){
+			list.remove(acc);
+			return true;
+		}
+		else
+			return false;
+	}
 }
