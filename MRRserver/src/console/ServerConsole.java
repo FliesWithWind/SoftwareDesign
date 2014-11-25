@@ -10,31 +10,11 @@ import network.*;
 
 public class ServerConsole {	
 	
-	//private static ArrayList<Account> AccountList;
 	private static ArrayList<Room> RoomList;
 	
 	public ServerConsole(){
 		
-	}
-	
-	/**
-	 * Method to find and return Account object using id
-	 * Returns null if Account was not found.
-	 * @param id
-	 * @return
-	 */
-	
-	/*private static Account findAccount(String id){
-		Account tmp;
-		for(int i=0;i<AccountList.size();i++){
-			if(AccountList.get(i).getId().equals(id)){
-				tmp=AccountList.get(i);
-				return tmp;
-			}
-		}
-		return null;
-	}*/
-	
+	}	 
 	
 	private static Account newAccount(String command){
     	String[] cmd = command.split(" ");	//Split string into parts
@@ -106,18 +86,7 @@ public class ServerConsole {
 	/*private static void listRooms(){
 		for(int i=0;i<RoomList.size();i++)
 			System.out.println("Name: " + RoomList.get(i).getName() + "\tCity: " + RoomList.get(i).getCity() + "\tLocation: " + RoomList.get(i).getLocation() + "\tCapacity: " + RoomList.get(i).getMaxcapacity() + "\tRent Cost: " + RoomList.get(i).getDefault_rentcost());
-	}
-	
-	private static void saveAccounts() throws FileNotFoundException, IOException{
-		ObjectOutputStream fileOut = new ObjectOutputStream(new FileOutputStream("accounts.xml"));
-		try{
-			fileOut.writeObject(AccountList);
-			fileOut.close();
-		}
-		catch(IOException e){
-			System.out.println("Encountered problem while writign to the file.");
-		}
-	}
+	}*/
 	
 	private static ArrayList<Account> loadAccounts() throws FileNotFoundException, IOException, ClassNotFoundException{
 		ObjectInputStream fileIn = new ObjectInputStream(new FileInputStream("accounts.xml"));
@@ -126,7 +95,7 @@ public class ServerConsole {
 		return list;
 	}
 	
-	private static void saveRooms() throws FileNotFoundException, IOException{
+	/*private static void saveRooms() throws FileNotFoundException, IOException{
 		ObjectOutputStream fileOut = new ObjectOutputStream(new FileOutputStream("rooms.xml"));
 		try{
 			fileOut.writeObject(RoomList);
@@ -181,11 +150,13 @@ public class ServerConsole {
 	        	System.out.println("Not implemented yet.");
 	        else if(message.startsWith("list_rooms"))
 	        	System.out.println("Not implemented yet.");
-	        else if(message.startsWith("save_accounts"))
-	        	System.out.println("Not implemented yet.");
-	        else if(message.startsWith("load_accounts"))
-	        	System.out.println("Not implemented yet.");
-	        else if(message.startsWith("save_rooms"))
+	        else if(message.startsWith("save_accounts")){
+	        	fileio.FileIO.saveData(processor.getAM().getAccountList());
+	        	fileio.FileIO.saveRegisters(processor.getAM().getRegisterList());
+	        }else if(message.startsWith("load_accounts")){
+	        	processor.getAM().setAccountList(fileio.FileIO.loadData());
+	        	processor.getAM().setRegisterList(fileio.FileIO.loadRegisters());
+	        }else if(message.startsWith("save_rooms"))
 	        	System.out.println("Not implemented yet.");
 	        else if(message.startsWith("load_rooms"))
 	        	System.out.println("Not implemented yet.");
