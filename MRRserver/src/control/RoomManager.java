@@ -10,6 +10,10 @@ public class RoomManager
 	
 	private ArrayList<Room> list;
 	
+	public RoomManager(){
+		list = new ArrayList<Room>();
+	}
+	
 	// search by search options contained in Room object, Reservation object
 	// found		: returns searched list
 	// not found	: returns zero length list
@@ -164,5 +168,14 @@ public class RoomManager
 				}
 		
 		return result;
+	}
+	
+	public void createRoom(Room inf,Account owner){
+		owner.addRoom(inf);
+		list.add(inf);
+	}
+	
+	public ArrayList<Room> getList(){
+		return list;
 	}
 }

@@ -37,7 +37,8 @@ public class Processor
 				break;
 				
 			case Packet.REGISTER:
-				accountmanager.addAccount((Account)packet.getData());
+				if(packet.getData()!=null)
+					accountmanager.addRegistration((Account)packet.getData());
 				break;
 				
 			case Packet.EDIT_ACNT:
@@ -49,7 +50,15 @@ public class Processor
 				break;
 				
 			case Packet.CREATE_ROOM:
-				
+				Account owner = accountmanager.searchAccount(packet.getId());
+				if(packet.getData()==null)
+					System.out.println("Null data!");
+				else if(owner!=null){
+					roommanager.createRoom((Room)packet.getData(),owner);
+					System.out.println("New room added for: " + owner.getName());
+				}
+				else
+					System.out.println("Account does not exist.");
 				break;
 				
 			case Packet.EDIT_ROOM:
@@ -105,10 +114,14 @@ public class Processor
 				break;				
 			
 		}
-		return null;
+		return packet;
 	}
 	
 	public AccountManager getAM(){
 		return accountmanager;
+	}
+	
+	public RoomManager getRM(){
+		return roommanager;
 	}
 }

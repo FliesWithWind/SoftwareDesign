@@ -12,12 +12,13 @@ public class Room implements Serializable
 	
 	private Account					owner;
 	private ArrayList<Reservation>	reservations;
+
+	private String	id;
 	private String	name;
 	private int		city; // Seoul - 0, Daejeon - 1, Daegu - 2, Jeonju - 3
 	private String	location;
 	private int		maxcapacity;
 	private float	default_rentcost;
-	private String id;
 
 	//Second constructor without specifying reservations ArrayList, as we just need to create an empty one 
 	public Room(Account owner,
@@ -31,21 +32,21 @@ public class Room implements Serializable
 		setLocation(location);
 		setMaxcapacity(maxcapacity);
 		setDefault_rentcost(default_rentcost);
-		setID(id);
+		setId(id);
 	}
-	
+
 	public Room(Account owner, ArrayList<Reservation> reservations,
 				String name, int city, String location, 
 				int maxcapacity, float default_rentcost, String id)
 	{
 		setOwner(owner);
 		setReservations(reservations);
+		setId(id);
 		setName(name);
 		setCity(city);
 		setLocation(location);
 		setMaxcapacity(maxcapacity);
 		setDefault_rentcost(default_rentcost);
-		setID(id);
 	}
 	
 	public Account getOwner()
@@ -67,7 +68,17 @@ public class Room implements Serializable
 	{
 		this.reservations = reservations;
 	}
-
+	
+	public String getId()
+	{
+		return id;
+	}
+	
+	public void setId(String id)
+	{
+		this.id = id;
+	}
+	
 	public String getName()
 	{
 		return name;
@@ -116,13 +127,5 @@ public class Room implements Serializable
 	public void setDefault_rentcost(float default_rentcost)
 	{
 		this.default_rentcost = default_rentcost;
-	}
-	
-	public void setID(String id){
-		this.id = id;
-	}
-	
-	public String getID(){
-		return id;
 	}
 }

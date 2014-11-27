@@ -32,6 +32,8 @@ public class Account implements Serializable
 		setEmail(email);
 		setPhonenum(phonenum);
 		setUniv_comp(univ_comp);
+		myreservations = new ArrayList<Reservation>();
+		myrooms = new ArrayList<Room>();
 	}
 	
 	public ArrayList<Reservation> getMyreservations()
@@ -122,5 +124,9 @@ public class Account implements Serializable
 	public void setUniv_comp(String univ_comp)
 	{
 		this.univ_comp = univ_comp;
+	}
+	
+	public void addRoom(Room newroom){
+		myrooms.add(newroom);
 	}
 }

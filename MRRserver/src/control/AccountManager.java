@@ -61,12 +61,12 @@ public class AccountManager
 		return 0;											// invalid
 	}*/
 	
-	public boolean addAccount(Account acc) throws Exception{
+	public boolean addRegistration(Account inf) throws Exception{
 		for(Account eacc : registerlist)	// check duplicated id
-			if(eacc.getId().equals(acc.getId())) return false;
-		if(searchAccount(acc.getId())!=null)
+			if(eacc.getId().equals(inf.getId())) return false;
+		if(searchAccount(inf.getId())!=null)
 			return false;
-		registerlist.add(acc);
+		registerlist.add(inf);
 		return true;
 	}
 	
@@ -85,17 +85,6 @@ public class AccountManager
 	public void setAccountList(ArrayList<Account> input){
 		this.list = input;
 	}
-		
-	//Method to move Account if it is accepted. If it does not exist in register list, return false
-	public boolean validateAccount(Account acc){
-		if(registerlist.contains(acc)){
-			list.add(acc);
-			registerlist.remove(acc);
-			return true;
-		}
-		else
-			return false;
-	}
 	
 	public boolean deleteRegistration(Account acc){
 		if(registerlist.contains(acc)){
@@ -113,5 +102,22 @@ public class AccountManager
 		}
 		else
 			return false;
+	}
+	
+	public Account searchRegistration(String id)
+	{
+		for(Account iter : registerlist) 					// iterates in account list
+			if(iter.getId().equals(id)) return iter;
+		
+		return null; 								// not found
+	}
+	
+	public boolean acceptRegistration(String id){
+		Account tmp = searchRegistration(id);
+		if(tmp==null)
+			return false;
+		list.add(tmp);
+		registerlist.remove(tmp);
+		return true;
 	}
 }

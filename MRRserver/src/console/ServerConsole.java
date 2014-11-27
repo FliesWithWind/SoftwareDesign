@@ -14,85 +14,35 @@ public class ServerConsole {
 	
 	public ServerConsole(){
 		
-	}	 
-	
-	private static Account newAccount(String command){
-    	String[] cmd = command.split(" ");	//Split string into parts
-    	if(cmd.length!=8){					//Check if command is correct
-    		System.out.println("[Error] Invalid number of parameters!");
-    		return null;
-    	} else{
-    		int type=0; // get account type value
-    		if(cmd[3].equalsIgnoreCase("user"))
-    			type=1;
-    		else if(cmd[3].equalsIgnoreCase("staff"))
-    			type=2;
-    		else if(cmd[3].equalsIgnoreCase("manager"))
-    			type=3;
-    		// Debug to check if string is split correctly
-    		//for(int i=0;i<cmd.length;i++)
-    		//	System.out.println(i + " " + cmd[i]);
-    		
-    		Account tmp = new Account(cmd[1],cmd[2],type,cmd[4],cmd[5],cmd[6],cmd[7]);
-    		System.out.println("New account sucessfully created.");
-    		return tmp;
-    	}
-	}
-	
-	
-	/*private static boolean newRoom(String command){
-    	String[] cmd = command.split(" ");	//Split string into parts
-    	if(cmd.length!=7){					//Check if command is correct
-    		System.out.println("[Error] Invalid number of parameters!");
-    		return false;
-    	} else{
-    		// Debug to check if string is split correctly
-    		//for(int i=0;i<cmd.length;i++)
-    		//	System.out.println(i + " " + cmd[i]);
-    		
-    		int city=0; //get city value
-    		if(cmd[3].equalsIgnoreCase("seoul"))
-    			city=1;
-    		else if(cmd[3].equalsIgnoreCase("daejeon"))
-    			city=2;
-    		else if(cmd[3].equalsIgnoreCase("daegu"))
-    			city=3;
-    		else if(cmd[3].equalsIgnoreCase("jeonju"))
-    			city=4;
-  
-    		Account acc = findAccount(cmd[1]);
-    		if(acc == null){
-    			System.out.println("Account id does not exist.");
-    			return false;
-    		} else {
-	    		Room tmp = new Room(acc,cmd[2],city,cmd[4],Integer.parseInt(cmd[5]),Float.parseFloat(cmd[6]));
-	    		try {
-	    			RoomList.add(tmp);
-	    		}
-	    		catch (Exception ex){
-	    			System.out.println("[Error] Problem occured while adding to the list.");
-	    		}
-	    		System.out.println("New account sucessfully created.");
-	    		return true;
-    		}
-    	}
-	}*/
+	}	 	
 	
 	private static void listAccounts(AccountManager am){
-		for(int i=0;i<am.getRegisterList().size();i++)
-			System.out.println("Name: " + am.getRegisterList().get(i).getName() + "\tID: " + am.getRegisterList().get(i).getId() + "\tE-mail: " + am.getRegisterList().get(i).getEmail() + "\tPhone number: " + am.getRegisterList().get(i).getPhonenum());
+		for(int i=0;i<am.getAccountList().size();i++)
+			System.out.println("Name: " + am.getAccountList().get(i).getName() + "\t\tID: " + am.getAccountList().get(i).getId() + "\tE-mail: " + am.getAccountList().get(i).getEmail() + "\tPhone number: " + am.getAccountList().get(i).getPhonenum());
 	}
 	
-	/*private static void listRooms(){
-		for(int i=0;i<RoomList.size();i++)
-			System.out.println("Name: " + RoomList.get(i).getName() + "\tCity: " + RoomList.get(i).getCity() + "\tLocation: " + RoomList.get(i).getLocation() + "\tCapacity: " + RoomList.get(i).getMaxcapacity() + "\tRent Cost: " + RoomList.get(i).getDefault_rentcost());
-	}*/
+	private static void listRegistrations(AccountManager am){
+		for(int i=0;i<am.getRegisterList().size();i++)
+			System.out.println("Name: " + am.getRegisterList().get(i).getName() + "\t\tID: " + am.getRegisterList().get(i).getId() + "\tE-mail: " + am.getRegisterList().get(i).getEmail() + "\tPhone number: " + am.getRegisterList().get(i).getPhonenum());
+	}
+	
+	private static void listRooms(RoomManager rm){
+		for(int i=0;i<rm.getList().size();i++)
+			System.out.println("Name: " + rm.getList().get(i).getName() + "\tCity: " + rm.getList().get(i).getCity() + "\tLocation: " + rm.getList().get(i).getLocation() + "\tCapacity: " + rm.getList().get(i).getMaxcapacity() + "\tRent Cost: " + rm.getList().get(i).getDefault_rentcost());
+	}
 	
 	private static ArrayList<Account> loadAccounts() throws FileNotFoundException, IOException, ClassNotFoundException{
 		ObjectInputStream fileIn = new ObjectInputStream(new FileInputStream("accounts.xml"));
 		ArrayList<Account> list = (ArrayList) fileIn.readObject();
 		fileIn.close();
 		return list;
+	}
+	
+	private static void acceptAll(AccountManager am){
+		int size = am.getRegisterList().size();
+		for(int i=0;i<size;i++)
+			if(am.acceptRegistration(am.getRegisterList().get(0).getId()))
+				System.out.println("Accepted sucesfully.");
 	}
 	
 	/*private static void saveRooms() throws FileNotFoundException, IOException{
@@ -116,7 +66,7 @@ public class ServerConsole {
 	public static void main(String[] args){
 		Processor processor = new Processor();
 		//AccountManager AM = new AccountManager();
-		RoomList = new ArrayList<Room>();
+		//RoomList = new ArrayList<Room>();
 		
 		
 		network.Listener net = new network.Listener(processor);
@@ -134,22 +84,22 @@ public class ServerConsole {
 	        message = input.readLine();
 	        if(message.equals("help")){
 	    		System.out.println(":::::::List of avalible commands:::::::");
-			 	System.out.println("create_account <login> <password> <user/staff/manager> <name> <e-mail> <phone_number> <commpany>");
-			 	System.out.println("create_room <owner_id> <name> <city> <location> <capacity> <rent_cost>");
-			 	System.out.println("list_accounts");
+	    		System.out.println("list_reg");
+	    		System.out.println("list_accounts");
 			 	System.out.println("list_rooms");
+			 	System.out.println("accept_all");
 			 	System.out.println("save_accounts");
 			 	System.out.println("load_accounts");
 			 	System.out.println("save_rooms");
 			 	System.out.println("load_rooms");
-	        } else if(message.startsWith("create_account"))
-	        	processor.getAM().addAccount(newAccount(message));
-	        else if(message.startsWith("list_accounts"))
+	        } else if(message.startsWith("list_accounts"))
 	        	listAccounts(processor.getAM());
-	        else if(message.startsWith("create_room"))
-	        	System.out.println("Not implemented yet.");
+	        else if(message.startsWith("list_reg"))
+	        	listRegistrations(processor.getAM());
 	        else if(message.startsWith("list_rooms"))
-	        	System.out.println("Not implemented yet.");
+	        	listRooms(processor.getRM());
+	        else if(message.startsWith("accept_all"))
+	        	acceptAll(processor.getAM());
 	        else if(message.startsWith("save_accounts")){
 	        	fileio.FileIO.saveData(processor.getAM().getAccountList());
 	        	fileio.FileIO.saveRegisters(processor.getAM().getRegisterList());
