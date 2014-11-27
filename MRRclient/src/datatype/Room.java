@@ -12,7 +12,6 @@ public class Room implements Serializable
 	
 	private Account					owner;
 	private ArrayList<Reservation>	reservations;
-	
 	private String	name;
 	private int		city; // Seoul - 0, Daejeon - 1, Daegu - 2, Jeonju - 3
 	private String	location;
@@ -68,7 +67,7 @@ public class Room implements Serializable
 	{
 		this.reservations = reservations;
 	}
-	
+
 	public String getName()
 	{
 		return name;

@@ -55,6 +55,9 @@ public class Network implements Runnable
 			{
 				e.printStackTrace();
 				break;
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 
