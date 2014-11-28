@@ -55,4 +55,8 @@ public class ReservationManager
 		} else
 			return false;
 	}
+	
+	public ArrayList<Reservation> getList(){
+		return list;
+	}
 }

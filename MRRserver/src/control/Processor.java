@@ -128,8 +128,7 @@ public class Processor
 				break;
 				
 			case Packet.QUERY_RSRVS:
-				
-				break;				
+					return new Packet(Packet._QUERY_RSRVS,null,null,reservationmanager.getList());			
 			
 		}
 		return packet;
