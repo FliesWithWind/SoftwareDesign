@@ -10,6 +10,8 @@ public class AccountManager
 	private ArrayList<Account> list;
 	private	ArrayList<Account> registerlist;
 	
+	
+	//creating empty lists
 	public AccountManager(){
 		this.list = new ArrayList<Account>();
 		this.registerlist = new ArrayList<Account>();
@@ -61,8 +63,14 @@ public class AccountManager
 		return 0;											// invalid
 	}*/
 	
+	/**
+	 * Add new registration entry. If there exist same ID it returns false.
+	 * @param inf
+	 * @return
+	 * @throws Exception
+	 */
 	public boolean addRegistration(Account inf) throws Exception{
-		for(Account eacc : registerlist)	// check duplicated id
+		for(Account eacc : registerlist)
 			if(eacc.getId().equals(inf.getId())) return false;
 		if(searchAccount(inf.getId())!=null)
 			return false;
@@ -86,18 +94,28 @@ public class AccountManager
 		this.list = input;
 	}
 	
-	public boolean deleteRegistration(Account acc){
-		if(registerlist.contains(acc)){
-			registerlist.remove(acc);
+	/**
+	 * Deleting registration. If not found, returns false.
+	 * @param inf
+	 * @return
+	 */
+	public boolean deleteRegistration(Account inf){
+		if(registerlist.contains(inf)){
+			registerlist.remove(inf);
 			return true;
 		}
 		else
 			return false;
 	}
 	
-	public boolean deleteAccount(Account acc){
-		if(registerlist.contains(acc)){
-			list.remove(acc);
+	/**
+	 * Deleting account. If not found returns false.
+	 * @param inf
+	 * @return
+	 */
+	public boolean deleteAccount(Account inf){
+		if(registerlist.contains(inf)){
+			list.remove(inf);
 			return true;
 		}
 		else
@@ -112,6 +130,11 @@ public class AccountManager
 		return null; 								// not found
 	}
 	
+	/**
+	 * Accepting registration.
+	 * @param id
+	 * @return
+	 */
 	public boolean acceptRegistration(String id){
 		Account tmp = searchRegistration(id);
 		if(tmp==null)
@@ -128,6 +151,12 @@ public class AccountManager
 		registerlist.remove(tmp);
 		return true;
 	}
+	
+	/**
+	 * Editing account. Everything can be changed, besides ID.
+	 * @param inf
+	 * @return
+	 */
 	
 	public boolean editAccount(Account inf){
 		int i = list.indexOf(inf);

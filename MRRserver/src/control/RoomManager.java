@@ -170,7 +170,15 @@ public class RoomManager
 		return result;
 	}
 	
+	/**
+	 * When creating a room, room ID is given server side and it is based on
+	 * owner ID and number of rooms  he has. (e.g. someid_room_1)
+	 * @param inf
+	 * @param owner
+	 */
+	
 	public void createRoom(Room inf,Account owner){
+		inf.setId(owner.getId() + "_room_" + owner.getMyrooms().size());
 		owner.addRoom(inf);
 		list.add(inf);
 	}
