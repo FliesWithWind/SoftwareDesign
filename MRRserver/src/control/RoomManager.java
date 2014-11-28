@@ -186,4 +186,31 @@ public class RoomManager
 	public ArrayList<Room> getList(){
 		return list;
 	}
+	
+	public Room searchRoom(String roomid)
+	{
+		for(Room iter : list) 					// iterates in account list
+			if(iter.getId().equals(roomid)) return iter;
+		
+		return null; 								// not found
+	}
+	
+	public boolean editRoom(Room inf){
+		int i = list.indexOf(inf);
+		if(i==-1)
+			return false;
+		list.get(i).setDefault_rentcost(inf.getDefault_rentcost());
+		list.get(i).setLocation(inf.getLocation());
+		list.get(i).setName(inf.getName());
+		list.get(i).setMaxcapacity(inf.getMaxcapacity());
+		return true;
+	}
+	
+	public boolean removeRoom(String roomid){
+		Room tmp = searchRoom(roomid);
+		if(tmp==null)
+			return false;
+		list.remove(tmp);
+		return true;
+	}
 }

@@ -65,11 +65,19 @@ public class Processor
 					return new Packet(Packet._REJECTED,null,null,null);
 				
 			case Packet.EDIT_ROOM:
-				
+				if(packet.getData()!=null)
+					if(roommanager.editRoom((Room)packet.getData()))
+						return new Packet(Packet._ACCEPTED,null,null,null);
+					else
+						return new Packet(Packet._REJECTED,null,null,null);
 				break;
 				
 			case Packet.REMOVE_ROOM:
-				
+				if(packet.getData()!=null)
+					if(roommanager.removeRoom((String)packet.getData()))
+						return new Packet(Packet._ACCEPTED,null,null,null);
+					else
+						return new Packet(Packet._REJECTED,null,null,null);
 				break;
 				
 			case Packet.MY_RSRVS:
