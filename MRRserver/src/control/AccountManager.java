@@ -120,4 +120,25 @@ public class AccountManager
 		registerlist.remove(tmp);
 		return true;
 	}
+	
+	public boolean rejectRegistration(String id){
+		Account tmp = searchRegistration(id);
+		if(tmp==null)
+			return false;
+		registerlist.remove(tmp);
+		return true;
+	}
+	
+	public boolean editAccount(Account inf){
+		int i = list.indexOf(inf);
+		if(i==-1)
+			return false;
+		list.get(i).setName(inf.getName());
+		list.get(i).setEmail(inf.getEmail());
+		list.get(i).setPhonenum(inf.getPhonenum());
+		list.get(i).setPw(inf.getPw());
+		list.get(i).setUniv_comp(inf.getUniv_comp());
+		list.get(i).setType(inf.getType());
+		return true;
+	}
 }

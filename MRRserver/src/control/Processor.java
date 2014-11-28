@@ -29,37 +29,40 @@ public class Processor
 		System.out.println("Packet recieved: " + packet.getFlag());
 		switch(packet.getFlag()){
 			case Packet.LOGIN:
-				
-				break;
-				
+					if(accountmanager.validate(packet.getId(), packet.getPw())!=0)
+						return new Packet(Packet._LOGIN,null,null,null);
+					else
+						return new Packet(Packet._INVALID_ACNT,null,null,null);
+					
 			case Packet.MY_ACNT:
-				
-				break;
+					return new Packet(Packet._MY_ACNT,null,null,accountmanager.searchAccount(packet.getId()));
 				
 			case Packet.REGISTER:
 				if(packet.getData()!=null)
-					accountmanager.addRegistration((Account)packet.getData());
+					if(accountmanager.addRegistration((Account)packet.getData()))
+						return new Packet(Packet._ACCEPTED,null,null,null);
+					else
+						return new Packet(Packet._REJECTED,null,null,null);
 				break;
 				
 			case Packet.EDIT_ACNT:
-				
+				if(packet.getData()!=null)
+					if(accountmanager.editAccount((Account)packet.getData()))
+						return new Packet(Packet._ACCEPTED,null,null,null);
+					else
+						return new Packet(Packet._REJECTED,null,null,null);
 				break;
 				
 			case Packet.MY_ROOMS:
-				
-				break;
+				return new Packet(Packet._MY_ROOMS,null,null,accountmanager.searchAccount(packet.getId()).getMyrooms());
 				
 			case Packet.CREATE_ROOM:
 				Account owner = accountmanager.searchAccount(packet.getId());
-				if(packet.getData()==null)
-					System.out.println("Null data!");
-				else if(owner!=null){
+				if(owner!=null){
 					roommanager.createRoom((Room)packet.getData(),owner);
-					System.out.println("New room added for: " + owner.getName());
-				}
-				else
-					System.out.println("Account does not exist.");
-				break;
+					return new Packet(Packet._ACCEPTED,null,null,null);
+				}else
+					return new Packet(Packet._REJECTED,null,null,null);
 				
 			case Packet.EDIT_ROOM:
 				
@@ -70,8 +73,7 @@ public class Processor
 				break;
 				
 			case Packet.MY_RSRVS:
-				
-				break;
+				return new Packet(Packet._MY_RSRVS,null,null,accountmanager.searchAccount(packet.getId()).getMyreservations());
 				
 			case Packet.RESERVE:
 				
@@ -98,11 +100,19 @@ public class Processor
 				//break;
 				
 			case Packet.ACCEPT_REG:
-				
+				if(packet.getData()!=null)
+					if(accountmanager.acceptRegistration((String)packet.getData()))
+						return new Packet(Packet._ACCEPTED,null,null,null);
+					else
+						return new Packet(Packet._REJECTED,null,null,null);
 				break;
 				
 			case Packet.REJECT_REG:
-				
+				if(packet.getData()!=null)
+					if(accountmanager.rejectRegistration((String)packet.getData()))
+						return new Packet(Packet._ACCEPTED,null,null,null);
+					else
+						return new Packet(Packet._REJECTED,null,null,null);
 				break;
 				
 			case Packet.SEARCH_ROOMS:
