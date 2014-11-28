@@ -28,7 +28,7 @@ public class ServerConsole {
 	
 	private static void listRooms(RoomManager rm){
 		for(int i=0;i<rm.getList().size();i++)
-			System.out.println("Name: " + rm.getList().get(i).getName() + "\tCity: " + rm.getList().get(i).getCity() + "\tLocation: " + rm.getList().get(i).getLocation() + "\tCapacity: " + rm.getList().get(i).getMaxcapacity() + "\tRent Cost: " + rm.getList().get(i).getDefault_rentcost());
+			System.out.println("ID: " + rm.getList().get(i).getId() + "\tName: " + rm.getList().get(i).getName() + "\tCity: " + rm.getList().get(i).getCity() + "\tLocation: " + rm.getList().get(i).getLocation() + "\tCapacity: " + rm.getList().get(i).getMaxcapacity() + "\tRent Cost: " + rm.getList().get(i).getDefault_rentcost());
 	}
 	
 	private static ArrayList<Account> loadAccounts() throws FileNotFoundException, IOException, ClassNotFoundException{

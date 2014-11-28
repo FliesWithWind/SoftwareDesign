@@ -16,24 +16,34 @@ public class NetTestClient
 		//System.out.println("Input form : ID PW type name email phonenum univ_comp");
 		
 		datatype.Account acc = new datatype.Account("admin","pass",3,"TestAdmin","admin@net.com","1214214","TestCompany");
-		datatype.Account acc1 = new datatype.Account("manager","pass",2,"TestManager","manager@net.com","1214214","TestCompany");
+		datatype.Account acc1 = new datatype.Account("manager1","pass",2,"TestManager","manager@net.com","1214214","TestCompany");
 		datatype.Account acc2 = new datatype.Account("user","pass",1,"TestUser","user@net.com","1214214","TestCompany");
+		datatype.Account acc3 = new datatype.Account("manager2","pass",2,"TestManager","manager@net.com","1214214","TestCompany");
 		
-		datatype.Room room = new datatype.Room(null, "TestRoom1", 1, "Random street", 20, 20000, "Clientsiede gen id");
-		datatype.Room room1 = new datatype.Room(null, "TestRoom2", 1, "Random street", 30, 50000, "Clientsiede gen id");
-		datatype.Room room2 = new datatype.Room(null, "TestRoom3", 1, "Random street", 40, 70000, "Clientsiede gen id");
+		datatype.Room room = new datatype.Room(null, "TestRoom1", 1, "Random street", 20, 20000, null);
+		datatype.Room room1 = new datatype.Room(null, "TestRoom2", 1, "Random street", 30, 50000, null);
+		datatype.Room room2 = new datatype.Room(null, "TestRoom3", 1, "Random street", 40, 70000, null);
+		datatype.Room room3 = new datatype.Room(null, "TestRoom4", 1, "Random street", 20, 20000, null);
+		datatype.Room room4 = new datatype.Room(null, "TestRoom5", 1, "Random street", 30, 50000, null);
+		datatype.Room room5 = new datatype.Room(null, "TestRoom6", 1, "Random street", 40, 70000, null);
+		
 		
 		try
 		{
 			while(!(msg = s.nextLine()).equals("q")){
 				if(msg.compareTo("accounts")==0){
-					net.send(new network.Packet(Packet.REGISTER, null, null, acc));
+					//net.send(new network.Packet(Packet.REGISTER, null, null, acc));
+					
 					net.send(new network.Packet(Packet.REGISTER, null, null, acc1));
-					net.send(new network.Packet(Packet.REGISTER, null, null, acc2));
+					//net.send(new network.Packet(Packet.REGISTER, null, null, acc2));
+					net.send(new network.Packet(Packet.REGISTER, null, null, acc3));
 				}else if(msg.compareTo("rooms")==0){
-					net.send(new network.Packet(Packet.CREATE_ROOM,"manager","pass",room));
-					net.send(new network.Packet(Packet.CREATE_ROOM,"manager","pass",room1));
-					net.send(new network.Packet(Packet.CREATE_ROOM,"manager","pass",room2));
+					net.send(new network.Packet(Packet.CREATE_ROOM,"manager1","pass",room));
+					net.send(new network.Packet(Packet.CREATE_ROOM,"manager1","pass",room1));
+					net.send(new network.Packet(Packet.CREATE_ROOM,"manager1","pass",room2));
+					net.send(new network.Packet(Packet.CREATE_ROOM,"manager2","pass",room3));
+					net.send(new network.Packet(Packet.CREATE_ROOM,"manager2","pass",room4));
+					net.send(new network.Packet(Packet.CREATE_ROOM,"manager2","pass",room5));
 				} else
 					net.send(new network.Packet(0, null, null, msg));
 			}
