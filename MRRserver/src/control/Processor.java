@@ -14,10 +14,23 @@ public class Processor
 	private RoomManager			roommanager;
 	private ReservationManager	reservationmanager;
 	
-	public Processor(){
-		accountmanager = new AccountManager();
-		roommanager = new RoomManager();
-		reservationmanager = new ReservationManager();
+	public Processor()
+	{
+		fileio = new FileIO();
+		ArrayList<Account> acclist 		= fileio.loadData();
+		ArrayList<Account> reglist 		= fileio.loadRegisters();
+		
+		ArrayList<Room>	roomlist		= new ArrayList<Room>();
+		ArrayList<Reservation> reslist	= new ArrayList<Reservation>();
+		for(Account iter : acclist)
+		{
+			for(Room e : iter.getMyrooms()) roomlist.add(e);
+			for(Reservation e : iter.getMyreservations()) reslist.add(e);
+		}
+		
+		accountmanager		= new AccountManager(acclist, reglist);
+		roommanager			= new RoomManager(roomlist);
+		reservationmanager	= new ReservationManager(reslist);
 	}
 	
 

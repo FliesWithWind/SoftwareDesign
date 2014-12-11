@@ -17,7 +17,7 @@ public class FileIO
 	{
 		ArrayList<Account> list = null;
 		is = new ObjectInputStream(new FileInputStream(DATALOC));
-		list = (ArrayList<Account>) is.readObject(); 
+		list = (ArrayList<Account>) is.readObject();
 		is.close();
 		return list;
 	}

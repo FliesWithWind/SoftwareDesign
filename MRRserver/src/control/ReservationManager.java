@@ -33,16 +33,18 @@ public class ReservationManager
 	public boolean requestCancelReservaation(String roomid,long date)
 	{
 		Reservation tmp = searchReservation(roomid,date);
-		if(tmp!=null){
+		if(tmp != null){
 			tmp.setReqcancel(true);
 			return true;
 		} else
 			return false;
 	}
 	
-	public boolean openReservation(Reservation inf){
+	public boolean openReservation(Reservation inf)
+	{
 		Reservation tmp = searchReservation(inf.getRoom().getId(),inf.getDate());
-		if(tmp!=null){
+		if(tmp!=null)
+		{
 			list.add(inf);
 			return true;
 		} else
