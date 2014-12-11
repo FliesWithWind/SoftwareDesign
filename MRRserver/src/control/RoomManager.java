@@ -15,56 +15,58 @@ public class RoomManager
 		this.list = list;
 	}
 
-	
 	/**
 	 * When creating a room, room ID is given server side and it is based on
 	 * owner ID and number of rooms  he has. (e.g. someid_room_1)
 	 * @param inf
 	 * @param owner
 	 */
-	
-	public void createRoom(Room inf,Account owner) throws Exception
+
+	public int createRoom(Room inf, Account owner) throws Exception
 	{
+		
 		inf.setId(owner.getId() + "_room_" + owner.getMyrooms().size());
-		owner.addRoom(inf);
+		owner.getMyrooms().add(inf);
 		list.add(inf);
+		return 0;
 	}
 	
-	public ArrayList<Room> getList(){
+	public ArrayList<Room> getList()
+	{
 		return list;
 	}
 	
-	public Room searchRoom(String roomid)
+	public Room searchRoom(String roomid) throws Exception
 	{
-		for(Room iter : list) 					// iterates in account list
+		for(Room iter : list) 						// iterates in account list
 			if(iter.getId().equals(roomid)) return iter;
 		
 		return null; 								// not found
 	}
 	
-	public boolean editRoom(Room inf){
+	public int editRoom(Room inf) throws Exception
+	{
 		int i = list.indexOf(inf);
-		if(i==-1)
-			return false;
+		if(i==-1) return 1;
 		list.get(i).setDefault_rentcost(inf.getDefault_rentcost());
 		list.get(i).setLocation(inf.getLocation());
 		list.get(i).setName(inf.getName());
 		list.get(i).setMaxcapacity(inf.getMaxcapacity());
-		return true;
+		return 0;
 	}
 	
-	public boolean removeRoom(String roomid){
+	public int removeRoom(String roomid) throws Exception
+	{
 		Room tmp = searchRoom(roomid);
-		if(tmp==null)
-			return false;
+		if(tmp == null) return 1;
 		list.remove(tmp);
-		return true;
+		return 0;
 	}
 	
 	// search by search options contained in Room object, Reservation object
 	// found		: returns searched list
 	// not found	: returns zero length list
-	public ArrayList<Room> primarySearch(Room roominf, Reservation reservationinf)
+	public ArrayList<Room> primarySearch(Room roominf, Reservation reservationinf) throws Exception
 	{
 		ArrayList<Room> targetlist = list;
 		

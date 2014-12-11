@@ -125,8 +125,4 @@ public class Account implements Serializable
 	{
 		this.univ_comp = univ_comp;
 	}
-	
-	public void addRoom(Room newroom){
-		myrooms.add(newroom);
-	}
 }

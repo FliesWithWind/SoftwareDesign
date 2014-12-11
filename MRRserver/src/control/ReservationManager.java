@@ -14,11 +14,14 @@ public class ReservationManager
 		this.list = list;
 	}
 
-	public int reserve(Room roomid, long date, Account account) throws Exception
+	public int reserve(Room room, long date, Account account) throws Exception
 	{
-		list.add(new Reservation(account,room.date,room.getDefault_rentcost(),false));
+		for(Reservation iter : room.getReservations())
+			if(iter.getDate() == date) 
+				iter.setClient(account);
+		account.getMyreservations().add(iter);
 		
-		return true;
+		return 2;
 	}
 	
 	public Reservation searchReservation(String roomid, long date)
@@ -30,20 +33,21 @@ public class ReservationManager
 	}
 	
 	
-	public boolean requestCancelReservaation(String roomid,long date)
+	public int requestCancelReservaation(String roomid, long date)
 	{
-		Reservation tmp = searchReservation(roomid,date);
-		if(tmp != null){
+		Reservation tmp = searchReservation(roomid, date);
+		
+		if(tmp != null)
+		{
 			tmp.setReqcancel(true);
-			return true;
-		} else
-			return false;
+			return 0;
+		} else return 1;
 	}
 	
-	public boolean openReservation(Reservation inf)
+	public int openReservation(Reservation inf) throws Exception
 	{
 		Reservation tmp = searchReservation(inf.getRoom().getId(),inf.getDate());
-		if(tmp!=null)
+		if(tmp != null)
 		{
 			list.add(inf);
 			return true;
@@ -51,17 +55,24 @@ public class ReservationManager
 			return false;
 	}
 	
-	/*public boolean closeReservation(String roomid, long date){
+	public int closeReservation(String roomid, long date)
+	{
 		
-	}*/
+	}
 	
-	public boolean cancelReservation(String roomid, long date){
-		Reservation tmp = searchReservation(roomid,date);
-		if(tmp!=null){
-			list.remove(tmp);
-			return true;
-		} else
-			return false;
+	public int cancelReservation(String roomid, long date)
+	{
+		Reservation tmp = searchReservation(roomid, date);
+		
+		if(tmp != null)
+		{
+			if(tmp.isReqcancel())
+			{
+				list.remove(tmp);
+				return 0;
+			}
+			return 2;
+		} else return 2;
 	}
 	
 	/*** check if it's valid form of Account information ***/
@@ -69,29 +80,7 @@ public class ReservationManager
 	// invalid	: false
 	private boolean validateReservationForm(Reservation inf) throws Exception
 	{
-		if(inf.get)
-		Pattern p = Pattern.compile("[^a-zA-Z0-9]");
-		if(p.matcher(inf.getId()).find()) return false;			// check if ID's alphanumeric
-		if(p.matcher(inf.getPw()).find()) return false;			// check if PW's alphanumeric
 		
-		int type = inf.getType();								// check type's range
-		if(type > 3 || type < 1) return false;
-		
-		String nametemp = inf.getName();						// check if name's just blank
-		nametemp = nametemp.replace(" ", "");
-		if(nametemp.equals("")) return false;
-		
-		if(	!inf.getEmail().contains("@") ||					// check if email contains @, .
-			!inf.getEmail().contains(".")) return false;
-		
-		p = Pattern.compile("^[[0-9]+[-]]");					// check if Phonenum's numeric
-		if(p.matcher(inf.getPhonenum()).find()) return false;
-
-		String univ_comptemp = inf.getUniv_comp();				// check if univ_comp's just blank
-		univ_comptemp.replace(" ", "");
-		if(univ_comptemp.equals("")) return false;
-		
-		return true;
 	}
 	
 	public ArrayList<Reservation> getList(){
