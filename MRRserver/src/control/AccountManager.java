@@ -1,6 +1,7 @@
 package control;
 
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 import datatype.*;
 
@@ -10,22 +11,10 @@ public class AccountManager
 	private ArrayList<Account> list;
 	private	ArrayList<Account> registerlist;
 	
-	
-	//creating empty lists
-	public AccountManager(){
-		this.list = new ArrayList<Account>();
-		this.registerlist = new ArrayList<Account>();
-	}
-
-	/*** search account with id ***/
-	// found		: returns account itself
-	// not found	: returns null
-	public Account searchAccount(String id) throws Exception
+	public AccountManager(ArrayList<Account> list, ArrayList<Account> registerlist)
 	{
-		for(Account iter : list) 					// iterates in account list
-			if(iter.getId().equals(id)) return iter;
-		
-		return null; 								// not found
+		this.list			= list;
+		this.registerlist	= registerlist;
 	}
 	
 	/*** validates id and pw ***/
@@ -39,135 +28,182 @@ public class AccountManager
 		if(client.getPw() == pw) return client.getType();	// valid
 		return 0;											// invalid
 	}
-	/*
-	// add Registration record to registerlist
-	// accepted						: returns 0
-	// rejected by duaccplicated id	: returns 1
-	public int addRegistration(Account inf)		roommanager
-=======
+
+	/*** search account with id ***/
+	// found		: returns account itself
+	// not found	: returns null
+	public Account searchAccount(String id) throws Exception
+	{
+		for(Account iter : list) 					// iterates in account list
+			if(iter.getId().equals(id)) return iter;
+		
+		return null; 								// not found
+	}
+	
 	/*** add Registration record to register list ***/
 	// accepted										: returns 0
-	// rejected by an invalid property form			: returns 1
+	// rejected by an invalid information form		: returns 1
 	// rejected by duplicated id in account list	: returns 2
 	// rejected by duplicated id in register list	: returns 3
-	/*public int addRegistration(Account inf) throws Exception
-	{
-		for(Account eacc : registerlist)	// check duplicated id
-			if(e.getId().equals(inf.getId())) return 1;
-		Account client = searchAccount(id);
-		inf.setId(inf.getId().toLowerCase());				// To Lower character string
-		inf.setMyrooms(new ArrayList<Room>());				// Clear room list
-		inf.setMyreservations(new ArrayList<Reservation>());// Clear reservation list
-		if(client == null) return 0;						// not found
-		if(client.getPw() == pw) return client.getType();	// valid
-		return 0;											// invalid
-	}*/
-	
-	/**
-	 * Add new registration entry. If there exist same ID it returns false.
-	 * @param inf
-	 * @return
-	 * @throws Exception
-	 */
-	public boolean addRegistration(Account inf) throws Exception{
-		for(Account eacc : registerlist)
-			if(eacc.getId().equals(inf.getId())) return false;
-		if(searchAccount(inf.getId())!=null)
-			return false;
+	public int addRegistration(Account inf) throws Exception
+	{	
+		inf.setId(inf.getId().toLowerCase());					// To Lower character string
+		inf.setMyrooms(new ArrayList<Room>());					// Clear room list
+		inf.setMyreservations(new ArrayList<Reservation>());	// Clear reservation list
+		inf.setId(inf.getId().replace(" ", ""));				// remove blanks in ID
+		inf.setPw(inf.getPw().replace(" ", ""));				// remove blanks in PW
+		
+		if(!validateAccountForm(inf)) return 1;					// check check form of information
+		if(searchAccount(inf.getId()) != null) return 2;		// check duplicated id in account list
+		if(searchRegistration(inf.getId()) != null) return 3;	// check duplicated id in register list
+		
 		registerlist.add(inf);
+		return 0;
+	}
+
+	/*** Edit Account information ***/
+	// accepted										: returns 0
+	// rejected by an invalid information form		: returns 1
+	// Account not found							: returns 2
+	// Editing id or type is unauthorized
+	public int editAccount(Account inf) throws Exception
+	{
+		if(!validateAccountForm(inf)) return 1;			// check if it's valid form
+		
+		Account target = searchAccount(inf.getId());
+		if(target == null) return 2;					// check if it's registered
+		
+		target.setPw(inf.getPw());
+		target.setName(inf.getName());
+		target.setEmail(inf.getEmail());
+		target.setPhonenum(inf.getPhonenum());
+		target.setUniv_comp(inf.getUniv_comp());
+		
+		return 0;
+	}
+
+	/*** Move a Registration to Account list ***/
+	// accepted										: returns 0
+	// Registration not found						: returns 1
+	public int acceptRegistration(String id) throws Exception
+	{
+		Account target = searchRegistration(id);
+		if(target == null) return 1;					// null checking
+		
+		list.add(target);
+		registerlist.remove(target);
+		
+		return 0;
+	}
+
+	/*** Remove a Registration from register list ***/
+	// accepted										: returns 0
+	// Registration not found						: returns 1
+	// Editing id or type is unauthorized
+	public int rejectRegistration(String id) throws Exception
+	{
+		Account target = searchRegistration(id);
+		if(target == null) return 1;
+		
+		registerlist.remove(target);
+		
+		return 0;
+	}
+	
+	/*** check if it's valid form of Account information ***/
+	// valid	: true
+	// invalid	: false
+	private boolean validateAccountForm(Account inf) throws Exception
+	{
+		Pattern p = Pattern.compile("[^a-zA-Z0-9]");
+		if(p.matcher(inf.getId()).find()) return false;			// check if ID's alphanumeric
+		if(p.matcher(inf.getPw()).find()) return false;			// check if PW's alphanumeric
+		
+		int type = inf.getType();								// check type's range
+		if(type > 3 || type < 1) return false;
+		
+		String nametemp = inf.getName();						// check if name's just blank
+		nametemp = nametemp.replace(" ", "");
+		if(nametemp.equals("")) return false;
+		
+		if(	!inf.getEmail().contains("@") ||					// check if email contains @, .
+			!inf.getEmail().contains(".")) return false;
+		
+		p = Pattern.compile("^[[0-9]+[-]]");					// check if Phonenum's numeric
+		if(p.matcher(inf.getPhonenum()).find()) return false;
+
+		String univ_comptemp = inf.getUniv_comp();				// check if univ_comp's just blank
+		univ_comptemp.replace(" ", "");
+		if(univ_comptemp.equals("")) return false;
+		
 		return true;
 	}
 	
-	public ArrayList<Account> getRegisterList(){
+	public ArrayList<Account> getRegisterList()
+	{
 		return registerlist;
 	}
 	
-	public ArrayList<Account> getAccountList(){
+	public ArrayList<Account> getAccountList()
+	{
 		return list;
 	}
 	
-	public void setRegisterList(ArrayList<Account> input){
+	public void setRegisterList(ArrayList<Account> input)
+	{
 		this.registerlist = input;
 	}
 	
-	public void setAccountList(ArrayList<Account> input){
+	public void setAccountList(ArrayList<Account> input)
+	{
 		this.list = input;
 	}
-	
-	/**
+
+	/*** search registration with id ***/
+	// found		: returns registration itself
+	// not found	: returns null
+	private Account searchRegistration(String id) throws Exception
+	{
+		for(Account iter : registerlist) 			// iterates in account list
+			if(iter.getId().equals(id)) return iter;
+		
+		return null; 								// not found
+	}
+
+	/* no need of this method. it's RoomManager's cancelRegistration()
+	/** 
 	 * Deleting registration. If not found, returns false.
 	 * @param inf
 	 * @return
 	 */
-	public boolean deleteRegistration(Account inf){
-		if(registerlist.contains(inf)){
+	/*
+	public int deleteRegistration(Account inf)
+	{
+		if(registerlist.contains(inf))
+		{
 			registerlist.remove(inf);
 			return true;
 		}
 		else
 			return false;
 	}
+	*/
 	
 	/**
 	 * Deleting account. If not found returns false.
 	 * @param inf
 	 * @return
-	 */
-	public boolean deleteAccount(Account inf){
-		if(registerlist.contains(inf)){
+	 
+	public boolean deleteAccount(String id)
+	{
+		searchAccount(id);
+		if(registerlist.contains(inf))
+		{
 			list.remove(inf);
 			return true;
 		}
 		else
 			return false;
 	}
-	
-	public Account searchRegistration(String id)
-	{
-		for(Account iter : registerlist) 					// iterates in account list
-			if(iter.getId().equals(id)) return iter;
-		
-		return null; 								// not found
-	}
-	
-	/**
-	 * Accepting registration.
-	 * @param id
-	 * @return
-	 */
-	public boolean acceptRegistration(String id){
-		Account tmp = searchRegistration(id);
-		if(tmp==null)
-			return false;
-		list.add(tmp);
-		registerlist.remove(tmp);
-		return true;
-	}
-	
-	public boolean rejectRegistration(String id){
-		Account tmp = searchRegistration(id);
-		if(tmp==null)
-			return false;
-		registerlist.remove(tmp);
-		return true;
-	}
-	
-	/**
-	 * Editing account. Everything can be changed, besides ID.
-	 * @param inf
-	 * @return
-	 */
-	
-	public boolean editAccount(Account inf){
-		int i = list.indexOf(inf);
-		if(i==-1)
-			return false;
-		list.get(i).setName(inf.getName());
-		list.get(i).setEmail(inf.getEmail());
-		list.get(i).setPhonenum(inf.getPhonenum());
-		list.get(i).setPw(inf.getPw());
-		list.get(i).setUniv_comp(inf.getUniv_comp());
-		list.get(i).setType(inf.getType());
-		return true;
-	}
+	*/
 }

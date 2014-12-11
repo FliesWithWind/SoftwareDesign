@@ -10,8 +10,55 @@ public class RoomManager
 	
 	private ArrayList<Room> list;
 	
-	public RoomManager(){
-		list = new ArrayList<Room>();
+	public RoomManager(ArrayList<Room> list)
+	{
+		this.list = list;
+	}
+
+	
+	/**
+	 * When creating a room, room ID is given server side and it is based on
+	 * owner ID and number of rooms  he has. (e.g. someid_room_1)
+	 * @param inf
+	 * @param owner
+	 */
+	
+	public void createRoom(Room inf,Account owner) throws Exception
+	{
+		inf.setId(owner.getId() + "_room_" + owner.getMyrooms().size());
+		owner.addRoom(inf);
+		list.add(inf);
+	}
+	
+	public ArrayList<Room> getList(){
+		return list;
+	}
+	
+	public Room searchRoom(String roomid)
+	{
+		for(Room iter : list) 					// iterates in account list
+			if(iter.getId().equals(roomid)) return iter;
+		
+		return null; 								// not found
+	}
+	
+	public boolean editRoom(Room inf){
+		int i = list.indexOf(inf);
+		if(i==-1)
+			return false;
+		list.get(i).setDefault_rentcost(inf.getDefault_rentcost());
+		list.get(i).setLocation(inf.getLocation());
+		list.get(i).setName(inf.getName());
+		list.get(i).setMaxcapacity(inf.getMaxcapacity());
+		return true;
+	}
+	
+	public boolean removeRoom(String roomid){
+		Room tmp = searchRoom(roomid);
+		if(tmp==null)
+			return false;
+		list.remove(tmp);
+		return true;
 	}
 	
 	// search by search options contained in Room object, Reservation object
@@ -168,49 +215,5 @@ public class RoomManager
 				}
 		
 		return result;
-	}
-	
-	/**
-	 * When creating a room, room ID is given server side and it is based on
-	 * owner ID and number of rooms  he has. (e.g. someid_room_1)
-	 * @param inf
-	 * @param owner
-	 */
-	
-	public void createRoom(Room inf,Account owner){
-		inf.setId(owner.getId() + "_room_" + owner.getMyrooms().size());
-		owner.addRoom(inf);
-		list.add(inf);
-	}
-	
-	public ArrayList<Room> getList(){
-		return list;
-	}
-	
-	public Room searchRoom(String roomid)
-	{
-		for(Room iter : list) 					// iterates in account list
-			if(iter.getId().equals(roomid)) return iter;
-		
-		return null; 								// not found
-	}
-	
-	public boolean editRoom(Room inf){
-		int i = list.indexOf(inf);
-		if(i==-1)
-			return false;
-		list.get(i).setDefault_rentcost(inf.getDefault_rentcost());
-		list.get(i).setLocation(inf.getLocation());
-		list.get(i).setName(inf.getName());
-		list.get(i).setMaxcapacity(inf.getMaxcapacity());
-		return true;
-	}
-	
-	public boolean removeRoom(String roomid){
-		Room tmp = searchRoom(roomid);
-		if(tmp==null)
-			return false;
-		list.remove(tmp);
-		return true;
 	}
 }
