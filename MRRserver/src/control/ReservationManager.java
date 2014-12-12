@@ -46,6 +46,7 @@ public class ReservationManager
 	
 	public int openReservation(Reservation inf) throws Exception
 	{
+		//reqCancel = 0
 		Reservation tmp = searchReservation(inf.getRoom().getId(),inf.getDate());
 		if(tmp != null)
 		{
@@ -75,6 +76,10 @@ public class ReservationManager
 		} else return 2;
 	}
 	
+	private boolean validateAccountForm(Account inf) throws Exception
+	{
+		
+	}
 	/*** check if it's valid form of Account information ***/
 	// valid	: true
 	// invalid	: false
