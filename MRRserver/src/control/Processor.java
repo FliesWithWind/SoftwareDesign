@@ -9,33 +9,53 @@ import java.util.ArrayList;
 
 public class Processor
 {
-	private FileIO				fileio;
+	// singleton /////////////////////////////////////////////
+	private	static volatile Processor self;   				//
+	public	static Processor getInstance()					//
+	{														//
+		if(self == null) synchronized(Processor.class)		//
+			{ if(self == null) self = new Processor(); }	//
+		return self;										//
+	}/////////////////////////////////////////////////////////
+	
 	private AccountManager		accountmanager;
 	private RoomManager			roommanager;
 	private ReservationManager	reservationmanager;
-	
+		
 	public Processor()
 	{
-		fileio = new FileIO();
-		ArrayList<Account> acclist 		= fileio.loadData();
-		ArrayList<Account> reglist 		= fileio.loadRegisters();
+		ArrayList<Account> acclist;
+		ArrayList<Account> reglist;
+		
+		try	// read from the data file
+		{
+			acclist	= FileIO.loadData();
+			reglist	= FileIO.loadRegisters();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			acclist	= new ArrayList<Account>();
+			reglist	= new ArrayList<Account>();
+			System.out.println("Created the new list");
+		}
 		
 		ArrayList<Room>	roomlist		= new ArrayList<Room>();
-		ArrayList<Reservation> reslist	= new ArrayList<Reservation>();
-		for(Account iter : acclist)
+		ArrayList<Reservation> rsrvlist	= new ArrayList<Reservation>();
+		
+		for(Account iter : acclist) // fill up roomlist and rsrvlist
 		{
 			for(Room e : iter.getMyrooms()) roomlist.add(e);
-			for(Reservation e : iter.getMyreservations()) reslist.add(e);
+			for(Reservation e : iter.getMyreservations()) rsrvlist.add(e);
 		}
 		
 		accountmanager		= new AccountManager(acclist, reglist);
 		roommanager			= new RoomManager(roomlist);
-		reservationmanager	= new ReservationManager(reslist);
+		reservationmanager	= new ReservationManager(rsrvlist);
 	}
 	
 
-	/*** Client sends Account object, and server converts it to String form 
-	 * @throws Exception */
+	/*** Client sends Account object, and server converts it to String form ***/
 	public Packet process(Packet packet) throws Exception
 	{
 		//For testing
@@ -145,13 +165,5 @@ public class Processor
 			
 		}
 		return packet;
-	}
-	
-	public AccountManager getAM(){
-		return accountmanager;
-	}
-	
-	public RoomManager getRM(){
-		return roommanager;
 	}
 }

@@ -32,7 +32,7 @@ public class AccountManager
 	/*** search account with id ***/
 	// found		: returns account itself
 	// not found	: returns null
-	public Account searchAccount(String id) throws Exception
+	public Account searchAccount(String id)
 	{
 		for(Account iter : list) 					// iterates in account list
 			if(iter.getId().equals(id)) return iter;
@@ -42,30 +42,30 @@ public class AccountManager
 	
 	/*** add Registration record to register list ***/
 	// accepted										: returns 0
-	// rejected by an invalid information form		: returns 1
-	// rejected by duplicated id in account list	: returns 2
-	// rejected by duplicated id in register list	: returns 3
+	// rejected by duplicated id in account list	: returns 1
+	// rejected by duplicated id in register list	: returns 2
+	// rejected by an invalid information form		: returns 3
 	public int addRegistration(Account inf) throws Exception
 	{	
 		inf.setId(inf.getId().toLowerCase());					// To Lower character string
-		inf.setMyrooms(new ArrayList<Room>());					// Clear room list
-		inf.setMyreservations(new ArrayList<Reservation>());	// Clear reservation list
+		inf.initMyrooms();										// Clear room list
+		inf.initMyreservations();								// Clear reservation list
 		inf.setId(inf.getId().replace(" ", ""));				// remove blanks in ID
 		inf.setPw(inf.getPw().replace(" ", ""));				// remove blanks in PW
 		
-		if(!validateAccountForm(inf)) return 1;					// check check form of information
-		if(searchAccount(inf.getId()) != null) return 2;		// check duplicated id in account list
-		if(searchRegistration(inf.getId()) != null) return 3;	// check duplicated id in register list
+		if(searchAccount(inf.getId()) != null) return 1;		// check duplicated id in account list
+		if(searchRegistration(inf.getId()) != null) return 2;	// check duplicated id in register list
+		if(!validateAccountForm(inf)) return 3;					// check check form of information
 		
 		registerlist.add(inf);
 		return 0;
 	}
 
 	/*** Edit Account information ***/
-	// accepted										: returns 0
-	// rejected by an invalid information form		: returns 1
-	// Account not found							: returns 2
-	// Editing id or type is unauthorized
+	// accepted			: returns 0
+	// not found		: returns 1
+	// invalid form		: returns 2
+	// Editing id or type is not allowed
 	public int editAccount(Account inf) throws Exception
 	{
 		if(!validateAccountForm(inf)) return 1;			// check if it's valid form
@@ -83,8 +83,8 @@ public class AccountManager
 	}
 
 	/*** Move a Registration to Account list ***/
-	// accepted										: returns 0
-	// Registration not found						: returns 1
+	// accepted		: returns 0
+	// not found	: returns 1
 	public int acceptRegistration(String id) throws Exception
 	{
 		Account target = searchRegistration(id);
@@ -97,8 +97,8 @@ public class AccountManager
 	}
 
 	/*** Remove a Registration from register list ***/
-	// accepted										: returns 0
-	// Registration not found						: returns 1
+	// accepted		: returns 0
+	// not found	: returns 1
 	// Editing id or type is unauthorized
 	public int rejectRegistration(String id) throws Exception
 	{
@@ -169,25 +169,6 @@ public class AccountManager
 		
 		return null; 								// not found
 	}
-
-	/* no need of this method. it's RoomManager's cancelRegistration()
-	/** 
-	 * Deleting registration. If not found, returns false.
-	 * @param inf
-	 * @return
-	 */
-	/*
-	public int deleteRegistration(Account inf)
-	{
-		if(registerlist.contains(inf))
-		{
-			registerlist.remove(inf);
-			return true;
-		}
-		else
-			return false;
-	}
-	*/
 	
 	/**
 	 * Deleting account. If not found returns false.

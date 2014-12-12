@@ -3,6 +3,8 @@ package network;
 import java.net.*;
 import java.io.*;
 
+import control.Processor;
+
 public class Network implements Runnable
 {
 	private control.Processor	processor;
@@ -12,10 +14,11 @@ public class Network implements Runnable
 	private ObjectOutputStream	os;
 	
 	// generates Input, Output Stream
-	public Network(control.Processor processor, Socket client)
+	public Network(Socket client)
 	{
-		this.processor	= processor;
-		this.client		= client;
+		processor	= Processor.getInstance();
+		this.client	= client;
+		
 		try
 		{
 			is = new ObjectInputStream(client.getInputStream());

@@ -8,13 +8,6 @@ public class Listener implements Runnable
 	private static final int PORT = 44444;
 
 	private ServerSocket		ss;
-	private control.Processor	processor;
-	
-	
-	public Listener(control.Processor processor)
-	{
-		this.processor = processor;
-	}
 	
 	// thread performs
 	public void run()
@@ -49,7 +42,7 @@ public class Listener implements Runnable
 									cs.getInetAddress().getHostName() + "(" + 
 									cs.getInetAddress().getHostAddress() + ")" +
 									" connected!");
-				new Thread(new Network(processor, cs)).start();
+				new Thread(new Network(cs)).start();
 			}
 			catch(IOException e)
 			{

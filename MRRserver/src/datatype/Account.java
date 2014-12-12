@@ -32,8 +32,6 @@ public class Account implements Serializable
 		setEmail(email);
 		setPhonenum(phonenum);
 		setUniv_comp(univ_comp);
-		myreservations = new ArrayList<Reservation>();
-		myrooms = new ArrayList<Room>();
 	}
 	
 	public ArrayList<Reservation> getMyreservations()
@@ -46,6 +44,11 @@ public class Account implements Serializable
 		this.myreservations = myreservations;
 	}
 	
+	public void initMyreservations()
+	{
+		myreservations = new ArrayList<Reservation>();
+	}
+	
 	public ArrayList<Room> getMyrooms()
 	{
 		return myrooms;
@@ -54,6 +57,11 @@ public class Account implements Serializable
 	public void setMyrooms(ArrayList<Room> myrooms)
 	{
 		this.myrooms = myrooms;
+	}
+	
+	public void initMyrooms()
+	{
+		myrooms = new ArrayList<Room>();
 	}
 	
 	public String getId()

@@ -8,7 +8,7 @@ public class Reservation implements Serializable
 	private Room	room;
 	
 	private long	date;		//	getTime() / 24 * 60 * 60 * 1000
-	private float	rentcost;	
+	private float	rentcost;
 	private boolean	reqcancel;	// Is requested by the client to be canceled?
 	
 	

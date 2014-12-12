@@ -3,10 +3,12 @@ package control;
 import datatype.*;
 
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 public class RoomManager
 {
-	public static final int DATE_AROUND_INTERVAL = 7; // 
+	public static final int DATE_AROUND_INTERVAL = 7; 			// 
+	public static final int ROOM_REMOVAL_FROM_LAST_RSRV = 30;	// 
 	
 	private ArrayList<Room> list;
 	
@@ -15,103 +17,95 @@ public class RoomManager
 		this.list = list;
 	}
 
-	/**
-	 * When creating a room, room ID is given server side and it is based on
-	 * owner ID and number of rooms  he has. (e.g. someid_room_1)
-	 * @param inf
-	 * @param owner
-	 */
-
+	/*** create room and locate it to the owner ***/
+	// success		: returns 0
+	// duplicated	: returns 1
+	// invalid form	: returns 2
 	public int createRoom(Room inf, Account owner) throws Exception
 	{
-		if(!validateRoomForm(inf)) return 1; //check room inf is valid
-		else
-		{
-			if(/*not occupied*/)
-			{
-				inf.setId(owner.getId() + "_room_" + owner.getMyrooms().size());
-				owner.getMyrooms().add(inf);
-				list.add(inf);
-				return 0;
-			}
-			else
-			{
-				//
-				return 1; //occupied
-			}
-		}
+		Room tmp = searchRoom(inf.getName());
 		
+		if(tmp != null) return 1;				// check duplication
+		if(!validateRoomForm(inf)) return 2;	// check if valid form
+
+		// we cannot use the naming rule because 'room deletion' exists in this system.
+		// inf.setId(owner.getId() + "_room_" + owner.getMyrooms().size());
+
+		inf.setOwner(owner);					// set room's owner
+		inf.initReservations();					// empty reservation list
+		owner.getMyrooms().add(inf);			// add to owner's room list
+		list.add(inf);							// add to list
+		return 0;
 	}
 	
-	public ArrayList<Room> getList()
-	{
-		return list;
-	}
-	
-	public Room searchRoom(String roomid) throws Exception
+	public Room searchRoom(String name)
 	{
 		for(Room iter : list) 						// iterates in account list
-			if(iter.getId().equals(roomid)) return iter;
+			if(iter.getName().equals(name)) return iter;
 		
 		return null; 								// not found
 	}
-	
+
+	/*** edit room with received information ***/
+	// success		: returns 0
+	// not found	: returns 1
+	// invalid form	: returns 2
 	public int editRoom(Room inf) throws Exception
 	{
-		if(!validateRoomForm(inf)) return 1;
-		else
-		{
-			int i = list.indexOf(inf);
-			if(i==-1) return 1;
-			list.get(i).setDefault_rentcost(inf.getDefault_rentcost());
-			list.get(i).setLocation(inf.getLocation());
-			list.get(i).setName(inf.getName());
-			list.get(i).setMaxcapacity(inf.getMaxcapacity());
+		Room tmp = searchRoom(inf.getName());
+		
+		if(tmp == null) return 1;				// check null
+		if(!validateRoomForm(inf)) return 2;	// check if valid form
+
+		tmp.setName(inf.getName());
+		tmp.setCity(inf.getCity());
+		tmp.setLocation(inf.getLocation());
+		tmp.setDefault_rentcost(inf.getDefault_rentcost());
+		tmp.setMaxcapacity(inf.getMaxcapacity());
+		
 		return 0;
-		}
 	}
-	
+
+	/*** remove room ***/
+	// success		: returns 0
+	// not found	: returns 1
+	// rejected		: returns 2
 	public int removeRoom(String roomid) throws Exception
 	{
 		Room tmp = searchRoom(roomid);
-		if(tmp == null) return 1;
+		
+		if(tmp == null) return 1;						// check null
+		for(Reservation iter : tmp.getReservations())
+			if(iter.getDate() >= DateTeller.getToday() + ROOM_REMOVAL_FROM_LAST_RSRV)
+				if(iter.getClient() != null) return 2;	// check if reserved
+		
 		list.remove(tmp);
 		return 0;
 	}
-	
+
+	/*** check if it's valid form of Room information ***/
+	// valid	: true
+	// invalid	: false
 	private boolean validateRoomForm(Room room) throws Exception
-	{
+	{   
 		Pattern p = Pattern.compile("[^a-zA-Z0-9]");
-		if(p.matcher(room.getId()).find()) return false;			// check if roomid is numeric
-		Pattern p = Pattern.compile("[]")
-		if(p.matcher(room.getName()).find()) return false;			// check if room name is 
-		
-		/*int type = inf.getType();								// check type's range
-		if(type > 3 || type < 1) return false;
-		*/
-		
-		String idtemp = room.getId();
-		idtemp = idtemp.replace(" ", "");						//check if ID is just blank
-		if(idtemp.equals("")) return false;
-		
-		String nametemp = room.getName();						// check if name's just blank
+		if(p.matcher(room.getName()).find()) return false;		// check if room name is 
+
+		String nametemp = room.getName();                  		// check if name's just blank
 		nametemp = nametemp.replace(" ", "");
 		if(nametemp.equals("")) return false;
-		
-		/*if(	!inf.getEmail().contains("@") ||					// check if email contains @, .
-			!inf.getEmail().contains(".")) return false;
-		
-		p = Pattern.compile("^[[0-9]+[-]]");					// check if Phonenum's numeric
-		if(p.matcher(inf.getPhonenum()).find()) return false;
 
-		String univ_comptemp = inf.getUniv_comp();				// check if univ_comp's just blank
-		univ_comptemp.replace(" ", "");
-		if(univ_comptemp.equals("")) return false;
-		*/
+		p = Pattern.compile("^[[a-zA-Z0-9] + [-]]");
+		if(p.matcher(room.getLocation()).find()) return false;	// Location valid check
+
+		String locationtemp = room.getLocation();
+		locationtemp = locationtemp.replace(" ", "");
+		if(locationtemp.equals("")) return false;
+
 		return true;
 	}
 	
-	// search by search options contained in Room object, Reservation object
+	/*** search by search options contained in Room object, Reservation object ***/
 	// found		: returns searched list
 	// not found	: returns zero length list
 	public ArrayList<Room> primarySearch(Room roominf, Reservation reservationinf) throws Exception
@@ -265,5 +259,10 @@ public class RoomManager
 				}
 		
 		return result;
+	}
+	
+	public ArrayList<Room> getList()
+	{
+		return list;
 	}
 }
