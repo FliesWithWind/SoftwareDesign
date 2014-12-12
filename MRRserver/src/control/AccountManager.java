@@ -53,9 +53,9 @@ public class AccountManager
 		inf.setId(inf.getId().replace(" ", ""));				// remove blanks in ID
 		inf.setPw(inf.getPw().replace(" ", ""));				// remove blanks in PW
 		
-		if(searchAccount(inf.getId()) != null) return 1;		// check duplicated id in account list
-		if(searchRegistration(inf.getId()) != null) return 2;	// check duplicated id in register list
-		if(!validateAccountForm(inf)) return 3;					// check check form of information
+		if(searchAccount(inf.getId()) != null)		return 1; // check duplicated id in account list
+		if(searchRegistration(inf.getId()) != null) return 2; // check duplicated id in register list
+		if(!validateAccountForm(inf))				return 3; // check check form of information
 		
 		registerlist.add(inf);
 		return 0;
@@ -68,10 +68,10 @@ public class AccountManager
 	// Editing id or type is not allowed
 	public int editAccount(Account inf) throws Exception
 	{
-		if(!validateAccountForm(inf)) return 1;			// check if it's valid form
-		
 		Account target = searchAccount(inf.getId());
-		if(target == null) return 2;					// check if it's registered
+		
+		if(!validateAccountForm(inf))	return 1; // check if it's valid form
+		if(target == null)				return 2; // check if it's registered
 		
 		target.setPw(inf.getPw());
 		target.setName(inf.getName());
@@ -88,7 +88,8 @@ public class AccountManager
 	public int acceptRegistration(String id) throws Exception
 	{
 		Account target = searchRegistration(id);
-		if(target == null) return 1;					// null checking
+		
+		if(target == null) return 1; // null checking
 		
 		list.add(target);
 		registerlist.remove(target);
@@ -103,7 +104,8 @@ public class AccountManager
 	public int rejectRegistration(String id) throws Exception
 	{
 		Account target = searchRegistration(id);
-		if(target == null) return 1;
+		
+		if(target == null) return 1; // null checking
 		
 		registerlist.remove(target);
 		
@@ -116,25 +118,25 @@ public class AccountManager
 	private boolean validateAccountForm(Account inf) throws Exception
 	{
 		Pattern p = Pattern.compile("[^a-zA-Z0-9]");
-		if(p.matcher(inf.getId()).find()) return false;			// check if ID's alphanumeric
-		if(p.matcher(inf.getPw()).find()) return false;			// check if PW's alphanumeric
+		if(p.matcher(inf.getId()).find())		return false; // check if ID's alphanumeric
+		if(p.matcher(inf.getPw()).find())		return false; // check if PW's alphanumeric
 		
-		int type = inf.getType();								// check type's range
-		if(type > 3 || type < 1) return false;
+		int type = inf.getType();
+		if(type > 3 || type < 1)				return false; // check type's range
 		
-		String nametemp = inf.getName();						// check if name's just blank
+		String nametemp = inf.getName();
 		nametemp = nametemp.replace(" ", "");
-		if(nametemp.equals("")) return false;
+		if(nametemp.equals(""))					return false; // check if name's just blank
 		
-		if(	!inf.getEmail().contains("@") ||					// check if email contains @, .
-			!inf.getEmail().contains(".")) return false;
+		if(	!inf.getEmail().contains("@") ||
+			!inf.getEmail().contains("."))		return false; // check if email contains @, .
 		
-		p = Pattern.compile("^[[0-9]+[-]]");					// check if Phonenum's numeric
-		if(p.matcher(inf.getPhonenum()).find()) return false;
+		p = Pattern.compile("^[[0-9]+[-]]");
+		if(p.matcher(inf.getPhonenum()).find())	return false; // check if Phonenum's numeric
 
-		String univ_comptemp = inf.getUniv_comp();				// check if univ_comp's just blank
+		String univ_comptemp = inf.getUniv_comp();				
 		univ_comptemp.replace(" ", "");
-		if(univ_comptemp.equals("")) return false;
+		if(univ_comptemp.equals(""))			return false; // check if univ_comp's just blank
 		
 		return true;
 	}
@@ -169,22 +171,4 @@ public class AccountManager
 		
 		return null; 								// not found
 	}
-	
-	/**
-	 * Deleting account. If not found returns false.
-	 * @param inf
-	 * @return
-	 
-	public boolean deleteAccount(String id)
-	{
-		searchAccount(id);
-		if(registerlist.contains(inf))
-		{
-			list.remove(inf);
-			return true;
-		}
-		else
-			return false;
-	}
-	*/
 }

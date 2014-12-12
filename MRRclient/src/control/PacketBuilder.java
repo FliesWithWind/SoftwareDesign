@@ -18,6 +18,8 @@ public class PacketBuilder
 		return self;											//
 	}/////////////////////////////////////////////////////////////
 	
+	public static final String CURRENT_VERSION = "0.5";
+	
 	// private UIs mainframe; ***to be implemented*** has UI object
 	private Network network;
 	
@@ -38,7 +40,7 @@ public class PacketBuilder
 		
 		try
 		{
-			network.send(new Packet(Packet.LOGIN, this.id, this.pw, null));
+			network.send(new Packet(Packet.LOGIN, this.id, this.pw, CURRENT_VERSION));
 		}
 		catch(IOException e)
 		{
@@ -66,7 +68,7 @@ public class PacketBuilder
 	{
 		try
 		{
-			network.send(new Packet(Packet.REGISTER, this.id, this.pw, inf));
+			network.send(new Packet(Packet.REGISTER, null, null, inf));
 		}
 		catch(IOException e)
 		{

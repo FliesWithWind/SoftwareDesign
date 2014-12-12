@@ -3,8 +3,11 @@ package datatype;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Account implements Serializable
+public class Account implements Serializable, Cloneable
 {
+	public Object clone() throws CloneNotSupportedException
+	{ return super.clone(); }
+	
 	public static final transient int UNSIGNED 	= 0;
 	public static final transient int USER	 	= 1;
 	public static final transient int STAFF		= 2;

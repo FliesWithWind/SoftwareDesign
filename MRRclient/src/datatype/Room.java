@@ -3,8 +3,11 @@ package datatype;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Room implements Serializable
+public class Room implements Serializable, Cloneable
 {
+	public Object clone() throws CloneNotSupportedException
+	{ return super.clone(); }
+	
 	public static final transient int SEOUL 	= 0;
 	public static final transient int DAEJEON 	= 1;
 	public static final transient int DAEGU 	= 2;

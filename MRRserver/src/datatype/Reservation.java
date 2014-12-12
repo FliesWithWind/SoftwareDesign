@@ -1,24 +1,31 @@
 package datatype;
 
 import java.io.Serializable;
+import java.util.Calendar;
 
-public class Reservation implements Serializable
+public class Reservation implements Serializable, Cloneable
 {
+	public Object clone() throws CloneNotSupportedException
+	{ return super.clone(); }
+	
 	private Account	client;
 	private Room	room;
 	
-	private long	date;		//	getTime() / 24 * 60 * 60 * 1000
+	private long	date;		// getTimeInMillis() / 100 * 60 * 60 * 24;
 	private float	rentcost;
-	private boolean	reqcancel;	// Is requested by the client to be canceled?
+	private boolean reserved;	// is reserved by a client
+	private boolean	reqcancel;	// is requested by the client to be canceled?
 	
 	
-	public Reservation(Account client, Room room, long date, float rentcost, boolean reqcancel)
+	public Reservation(	Account client, Room room, long date, float rentcost,
+						boolean reqcancel, boolean reserved)
 	{
 		setClient(client);
 		setRoom(room);
 		setDate(date);
 		setRentcost(rentcost);
 		setReqcancel(reqcancel);
+		setReserved(reserved);
 	}
 	
 	public Account getClient()
@@ -69,5 +76,15 @@ public class Reservation implements Serializable
 	public void setReqcancel(boolean reqcancel)
 	{
 		this.reqcancel = reqcancel;
+	}
+	
+	public boolean isReserved()
+	{
+		return reserved;
+	}
+
+	public void setReserved(boolean reserved)
+	{
+		this.reserved = reserved;
 	}
 }

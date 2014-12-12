@@ -25,22 +25,19 @@ public class RoomManager
 	{
 		Room tmp = searchRoom(inf.getName());
 		
-		if(tmp != null) return 1;				// check duplication
-		if(!validateRoomForm(inf)) return 2;	// check if valid form
-
-		// we cannot use the naming rule because 'room deletion' exists in this system.
-		// inf.setId(owner.getId() + "_room_" + owner.getMyrooms().size());
-
-		inf.setOwner(owner);					// set room's owner
-		inf.initReservations();					// empty reservation list
-		owner.getMyrooms().add(inf);			// add to owner's room list
-		list.add(inf);							// add to list
+		if(tmp != null)				return 1; // check duplication
+		if(!validateRoomForm(inf))	return 2; // check if valid form
+		
+		inf.setOwner(owner);			// set room's owner
+		inf.initReservations();			// empty reservation list
+		owner.getMyrooms().add(inf);	// add to owner's room list
+		list.add(inf);					// add to list
 		return 0;
 	}
 	
 	public Room searchRoom(String name)
 	{
-		for(Room iter : list) 						// iterates in account list
+		for(Room iter : list) 						// iterates in room list
 			if(iter.getName().equals(name)) return iter;
 		
 		return null; 								// not found
@@ -54,8 +51,8 @@ public class RoomManager
 	{
 		Room tmp = searchRoom(inf.getName());
 		
-		if(tmp == null) return 1;				// check null
-		if(!validateRoomForm(inf)) return 2;	// check if valid form
+		if(tmp == null)				return 1; // check null
+		if(!validateRoomForm(inf))	return 2; // check if valid form
 
 		tmp.setName(inf.getName());
 		tmp.setCity(inf.getCity());
@@ -74,10 +71,10 @@ public class RoomManager
 	{
 		Room tmp = searchRoom(roomid);
 		
-		if(tmp == null) return 1;						// check null
+		if(tmp == null)							return 1; // check null
 		for(Reservation iter : tmp.getReservations())
 			if(iter.getDate() >= DateTeller.getToday() + ROOM_REMOVAL_FROM_LAST_RSRV)
-				if(iter.getClient() != null) return 2;	// check if reserved
+				if(iter.getClient() != null)	return 2; // check if reserved
 		
 		list.remove(tmp);
 		return 0;
@@ -89,18 +86,18 @@ public class RoomManager
 	private boolean validateRoomForm(Room room) throws Exception
 	{   
 		Pattern p = Pattern.compile("[^a-zA-Z0-9]");
-		if(p.matcher(room.getName()).find()) return false;		// check if room name is 
+		if(p.matcher(room.getName()).find())		return false; // check if room name is alphanumeric
 
-		String nametemp = room.getName();                  		// check if name's just blank
+		String nametemp = room.getName();
 		nametemp = nametemp.replace(" ", "");
-		if(nametemp.equals("")) return false;
+		if(nametemp.equals(""))						return false; // check if name's just blank
 
 		p = Pattern.compile("^[[a-zA-Z0-9] + [-]]");
-		if(p.matcher(room.getLocation()).find()) return false;	// Location valid check
+		if(p.matcher(room.getLocation()).find())	return false; // location string valid check
 
 		String locationtemp = room.getLocation();
 		locationtemp = locationtemp.replace(" ", "");
-		if(locationtemp.equals("")) return false;
+		if(locationtemp.equals(""))					return false; // check if location's just blank
 
 		return true;
 	}
@@ -259,10 +256,5 @@ public class RoomManager
 				}
 		
 		return result;
-	}
-	
-	public ArrayList<Room> getList()
-	{
-		return list;
 	}
 }
