@@ -28,7 +28,7 @@ public class ReservationManager
 	{
 		for(Reservation iter : list) 				// iterates in account list
 			if(iter.getRoom().getId().equals(roomid) && iter.getDate()==date) return iter;
-		
+		l
 		return null; 								// not found
 	}
 	
