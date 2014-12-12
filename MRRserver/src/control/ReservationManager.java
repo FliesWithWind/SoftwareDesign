@@ -33,7 +33,7 @@ public class ReservationManager
 	}
 	
 	
-	public int requestCancelReservaation(String roomid, long date)
+	public int requestCancelReservation(String roomid, long date)
 	{
 		Reservation tmp = searchReservation(roomid, date);
 		
