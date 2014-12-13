@@ -40,6 +40,12 @@ public class Processor
 			acclist	= new ArrayList<Account>();
 			reglist	= new ArrayList<Account>();
 			System.out.println("Created the new list");
+			Account admin = new Account("admin", "zigzag363", 3, "SonKyuho", 
+					"zkalffntm@gmail.com", "010-9061-3123", "KNU");
+			admin.setMyrooms(new ArrayList<Room>());
+			admin.setMyreservations(new ArrayList<Reservation>());
+			acclist.add(admin);
+			System.out.println("Administrator added to list");
 		}
 		
 		ArrayList<Room>	roomlist		= new ArrayList<Room>();
@@ -94,7 +100,7 @@ public class Processor
 		case Packet.LOGIN: // version check
 			if(!((String)packet.getData()).equals(CURRENT_VERSION))
 				return new Packet(Packet._OUTDATED_VERSION, null, null, CURRENT_VERSION);
-			return new Packet(Packet._ACCEPTED, null, null, null);
+			return new Packet(Packet._ACCEPTED, null, null, acctype);
 			
 		case Packet.MY_ACNT: // authority check > send account
 			if(acctype != 3) if(!packet.getId().equals((String)packet.getData()))

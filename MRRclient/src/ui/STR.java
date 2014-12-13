@@ -8,16 +8,20 @@ public class STR
 	public static final String
 	CURRENT_VERSION	= "0.5",
 
-	NOTI_TITLE_CONNECTION_ERROR		= "Connection Error",
-	NOTI_CONTENT_CONNECTION_ERROR	= "Cannot Connect to server.",
-	
+	NOTI_ACCEPTED           = "The request was submitted successfully.",
+            
+	NOTI_CONNECTION_ERROR	= "Connection Error",
+            
+    NOTI_INVALID_FORM       = "Written form is invalid. Please check again.",       
+    NOTI_SHORT_IDPW         = "Lengths of ID and PW have to be longer than 4 at least.",
+            
+	NOTI_INVALID_ACNT		= "The account is not registered or submitted information is wrong.",
+            
 	/***************************************************************************/
 	
-	NOTI_TITLE_ACCEPTED				= "Accepted",
-	NOTI_CONTENT_ACCEPTED			= "The request was submitted successfully.",
+    LABEL_STATE_IDLE        = "Idle State",
+    LABEL_STATE_BUSY        = "Processing...",
 	
-	NOTI_TITLE_INVALID_ACNT			= "Invalid Account",
-	NOTI_CONTENT_INVALID_ACNT		= "The account is not registered or submitted information is wrong.",
 			
 	NOTI_TITLE_INVALID_ACCESS		= "Invalid Access",
 	NOTI_CONTENT_INVALID_ACCESS		= "You are not authorized for the request.",

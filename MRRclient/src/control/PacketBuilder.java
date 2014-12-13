@@ -22,7 +22,7 @@ public class PacketBuilder
 	
 	// private UIs mainframe; ***to be implemented*** has UI object
 	private Network network;
-	
+        
 	private String id;
 	private String pw;
 	
@@ -32,6 +32,26 @@ public class PacketBuilder
 		network = Network.getInstance();
 	}
 	
+    private void handleConnectionError(int flag)
+    {
+        switch(flag)
+        {
+        case Packet.LOGIN:
+            LoginFrame.getInstance().setEnabled(true);
+            LoginFrame.getInstance().showDialog(STR.NOTI_CONNECTION_ERROR);
+            break;
+            
+        case Packet.REGISTER:
+            RegisterFrame.getInstance().setEnabled(true);
+            RegisterFrame.getInstance().showDialog(STR.NOTI_CONNECTION_ERROR);
+            break;
+            
+        default:
+            MainFrame.getInstance().unblock();
+            MainFrame.getInstance().showDialog(STR.NOTI_CONNECTION_ERROR);
+        }
+    }
+    
 	// Request to validate ID-PW
 	public void login(String id, String pw)
 	{
@@ -43,10 +63,7 @@ public class PacketBuilder
 			network.send(new Packet(Packet.LOGIN, this.id, this.pw, CURRENT_VERSION));
 		}
 		catch(IOException e)
-		{
-			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
-			// mainframe.unblock();
-		}
+		{handleConnectionError(Packet.LOGIN);}
 	}
 
 	// View my account properties
@@ -57,10 +74,7 @@ public class PacketBuilder
 			network.send(new Packet(Packet.MY_ACNT, this.id, this.pw, id));
 		}
 		catch(IOException e)
-		{
-			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
-			// mainframe.unblock();
-		}
+		{handleConnectionError(Packet.MY_ACNT);}
 	}
 
 	// Request to register
@@ -71,10 +85,7 @@ public class PacketBuilder
 			network.send(new Packet(Packet.REGISTER, null, null, inf));
 		}
 		catch(IOException e)
-		{
-			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
-			// mainframe.unblock();
-		}
+		{handleConnectionError(Packet.REGISTER);}
 	}
 
 	// Edit my account properties
@@ -85,10 +96,7 @@ public class PacketBuilder
 			network.send(new Packet(Packet.EDIT_ACNT, this.id, this.pw, inf));
 		}
 		catch(IOException e)
-		{
-			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
-			// mainframe.unblock();
-		}
+		{handleConnectionError(Packet.EDIT_ACNT);}
 	}
 
 	// View my room list
@@ -99,10 +107,7 @@ public class PacketBuilder
 			network.send(new Packet(Packet.MY_ROOMS, this.id, this.pw, id));
 		}
 		catch(IOException e)
-		{
-			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
-			// mainframe.unblock();
-		}
+		{handleConnectionError(Packet.MY_ROOMS);}
 	}
 
 	// Create new room
@@ -114,10 +119,7 @@ public class PacketBuilder
 			network.send(new Packet(Packet.CREATE_ROOM, this.id, this.pw, inf));
 		}
 		catch(IOException e)
-		{
-			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
-			// mainframe.unblock();
-		}
+		{handleConnectionError(Packet.CREATE_ROOM);}
 	}
 
 	// Edit room properties
@@ -128,10 +130,7 @@ public class PacketBuilder
 			network.send(new Packet(Packet.EDIT_ROOM, this.id, this.pw, inf));
 		}
 		catch(IOException e)
-		{
-			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
-			// mainframe.unblock();
-		}
+		{handleConnectionError(Packet.EDIT_ROOM);}
 	}
 
 	// Remove room
@@ -142,10 +141,7 @@ public class PacketBuilder
 			network.send(new Packet(Packet.REMOVE_ROOM, this.id, this.pw, name));
 		}
 		catch(IOException e)
-		{
-			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
-			// mainframe.unblock();
-		}
+		{handleConnectionError(Packet.REMOVE_ROOM);}
 	}
 
 	// View reservation list I reserved
@@ -156,10 +152,7 @@ public class PacketBuilder
 			network.send(new Packet(Packet.MY_RSRVS, this.id, this.pw, id));
 		}
 		catch(IOException e)
-		{
-			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
-			// mainframe.unblock();
-		}
+		{handleConnectionError(Packet.MY_RSRVS);}
 	}
 
 	// Reserve a room at a certain date
@@ -172,10 +165,7 @@ public class PacketBuilder
 			network.send(new Packet(Packet.RESERVE, this.id, this.pw, inf));
 		}
 		catch(IOException e)
-		{
-			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
-			// mainframe.unblock();
-		}
+		{handleConnectionError(Packet.RESERVE);}
 	}
 
 	// Request to cancel a certain reservation
@@ -188,10 +178,7 @@ public class PacketBuilder
 			network.send(new Packet(Packet.REQ_CANCEL_RSRV, this.id, this.pw, inf));
 		}
 		catch(IOException e)
-		{
-			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
-			// mainframe.unblock();
-		}
+		{handleConnectionError(Packet.REQ_CANCEL_RSRV);}
 	}
 
 	// Open a room in a certain date to be leased
@@ -203,10 +190,7 @@ public class PacketBuilder
 			network.send(new Packet(Packet.OPEN_RSRV, this.id, this.pw, inf));
 		}
 		catch(IOException e)
-		{
-			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
-			// mainframe.unblock();
-		}
+		{handleConnectionError(Packet.OPEN_RSRV);}
 	}
 
 	// Close a room not to be leased
@@ -219,10 +203,7 @@ public class PacketBuilder
 			network.send(new Packet(Packet.CLOSE_RSRV, this.id, this.pw, inf));
 		}
 		catch(IOException e)
-		{
-			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
-			// mainframe.unblock();
-		}
+		{handleConnectionError(Packet.CLOSE_RSRV);}
 	}
 
 	// Cancel a reservation requested to be canceled
@@ -235,10 +216,7 @@ public class PacketBuilder
 			network.send(new Packet(Packet.CANCEL_RSRV, this.id, this.pw, inf));
 		}
 		catch(IOException e)
-		{
-			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
-			// mainframe.unblock();
-		}
+		{handleConnectionError(Packet.CANCEL_RSRV);}
 	}
 
 	// Query for requests for registration
@@ -249,10 +227,7 @@ public class PacketBuilder
 			network.send(new Packet(Packet.QUERY_REGS, this.id, this.pw, null));
 		}
 		catch(IOException e)
-		{
-			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
-			// mainframe.unblock();
-		}
+		{handleConnectionError(Packet.QUERY_REGS);}
 	}
 
 	// Accept registration
@@ -263,10 +238,7 @@ public class PacketBuilder
 			network.send(new Packet(Packet.ACCEPT_REG, this.id, this.pw, id));
 		}
 		catch(IOException e)
-		{
-			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
-			// mainframe.unblock();
-		}
+		{handleConnectionError(Packet.ACCEPT_REG);}
 	}
 
 	// Reject registration
@@ -277,10 +249,7 @@ public class PacketBuilder
 			network.send(new Packet(Packet.REJECT_REG, this.id, this.pw, id));
 		}
 		catch(IOException e)
-		{
-			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
-			// mainframe.unblock();
-		}
+		{handleConnectionError(Packet.REJECT_REG);}
 	}
 
 	// Search rooms
@@ -292,10 +261,7 @@ public class PacketBuilder
 			network.send(new Packet(Packet.SEARCH_ROOMS, this.id, this.pw, inf));
 		}
 		catch(IOException e)
-		{
-			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
-			// mainframe.unblock();
-		}
+		{handleConnectionError(Packet.SEARCH_ROOMS);}
 	}
 
 	// Query reservations on a certain room
@@ -308,10 +274,7 @@ public class PacketBuilder
 			network.send(new Packet(Packet.QUERY_RSRVS, this.id, this.pw, inf));
 		}
 		catch(IOException e)
-		{
-			// mainframe.dialogue(1, STR.CONNECTION_ERROR, STR.CONNECTION_ERROR);
-			// mainframe.unblock();
-		}
+		{handleConnectionError(Packet.QUERY_RSRVS);}
 	}
 	
 }

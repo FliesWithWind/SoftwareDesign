@@ -9,7 +9,7 @@ import datatype.Room;
 import network.*;
 
 public class ServerConsole {	
-	
+	/*
 	private static ArrayList<Room> RoomList;
 	
 	public ServerConsole(){
@@ -62,7 +62,7 @@ public class ServerConsole {
 		fileIn.close();
 		return list;
 	}*/
-	
+	/*
 	public static void main(String[] args){
 		Processor processor = new Processor();
 		//AccountManager AM = new AccountManager();
@@ -119,4 +119,5 @@ public class ServerConsole {
 	    }
 		
 	}
+	*/
 }

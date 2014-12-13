@@ -3,6 +3,7 @@ package control;
 import java.util.ArrayList;
 
 import datatype.*;
+import javax.swing.WindowConstants;
 import network.Packet;
 import ui.*;
 
@@ -17,34 +18,30 @@ public class PacketProcessor
 		return self;											//
 	}/////////////////////////////////////////////////////////////
 	
-	// UI mainframe;
+	private MainFrame Mainframe;
 	private int context;
-	private PacketBuilder packetbuilder;
-	
-	private PacketProcessor ()
-	{
-		packetbuilder = PacketBuilder.getInstance();
-		// ***to be implemented***
-	}
-	
+
 	public void process(Packet packet)
 	{
-		System.out.println((String)packet.getData()); //  For test
-		
 		if(packet.getFlag() == Packet._ACCEPTED)
 			switch(context)
 			{
 			case Packet.LOGIN:
-				// switch to mainframe
-				break;
-				
+                LoginFrame.getInstance().setDefaultCloseOperation(javax.swing.JFrame.DISPOSE_ON_CLOSE);
+                LoginFrame.getInstance().dispose();
+                MainFrame.setAccessType((int)packet.getData());
+                MainFrame.getInstance().setVisible(true);
+                break;
+
 			case Packet.MY_ACNT:
 				// mainframe.updateAccountSection((Account) packet.getData());
 				break;
 
 			case Packet.REGISTER:
-				// mainframe.dialogue(0, STR.NOTI_TITLE_ACCEPTED, STR.NOTI_CONTENT_ACCEPTED);
-				break;
+                RegisterFrame.getInstance().dispose();
+                LoginFrame.getInstance().setEnabled(true);
+                LoginFrame.getInstance().showDialog(STR.NOTI_ACCEPTED);
+                break;
 
 			case Packet.EDIT_ACNT:
 				// mainframe.dialogue(0, STR.NOTI_TITLE_ACCEPTED, STR.NOTI_CONTENT_ACCEPTED);
@@ -127,9 +124,108 @@ public class PacketProcessor
 				break;
 			}
 		
+		if(packet.getFlag() == Packet._REJECTED)
+			switch(context)
+			{
+			case Packet.MY_ACNT:
+				// mainframe.updateAccountSection((Account) packet.getData());
+				break;
+
+			case Packet.REGISTER:
+                RegisterFrame.getInstance().dispose();
+                LoginFrame.getInstance().setEnabled(true);
+                LoginFrame.getInstance().showDialog(STR.NOTI_ACCEPTED);
+                break;
+
+			case Packet.EDIT_ACNT:
+				// mainframe.dialogue(0, STR.NOTI_TITLE_ACCEPTED, STR.NOTI_CONTENT_ACCEPTED);
+				break;
+
+			case Packet.MY_ROOMS:
+				if(((ArrayList<Room>) packet.getData()).size() == 0); // remove semicolon when implementing
+					// mainframe.dialogue(1, STR.NOTI_TITLE_NO_RESULT, STR.NOTI_CONTENT_NO_RESULT);
+				// else mainframe.updateMyRooms((ArrayList<Room>) packet.getData());
+				break;
+
+			case Packet.CREATE_ROOM:
+				// else mainframe.updateMyRooms((ArrayList<Room>) packet.getData());
+				// mainframe.dialogue(0, STR.NOTI_TITLE_CREATE_ROOM, STR.NOTI_CONTENT_CREATE_ROOM);
+				break;
+				
+			case Packet.EDIT_ROOM:
+				// else mainframe.updateMyRooms((ArrayList<Room>) packet.getData());
+				// mainframe.dialogue(0, STR.NOTI_TITLE_EDIT_ROOM, STR.NOTI_CONTENT_EDIT_ROOM);
+				return;
+
+			case Packet.REMOVE_ROOM:
+				// else mainframe.updateMyRooms((ArrayList<Room>) packet.getData());
+				// mainframe.dialogue(0, STR.NOTI_TITLE_ACCEPTED, STR.NOTI_CONTENT_ACCEPTED);
+				break;
+
+			case Packet.MY_RSRVS:
+				if(((ArrayList<Room>) packet.getData()).size() == 0); // remove semicolon when implementing
+					// mainframe.dialogue(1, STR.NOTI_TITLE_NO_RESULT, STR.NOTI_CONTENT_NO_RESULT);
+				// else mainframe.updateMyReservations((ArrayList<Room>) packet.getData());
+				break;
+
+			case Packet.RESERVE:
+				// mainframe.updateMyReservations((ArrayList<Reservation>) packet.getData()[0]);
+				// mainframe.updateCalendar((ArrayList<Reservation>) packet.getData()[1]);
+				// mainframe.dialogue(0, STR.NOTI_TITLE_RESERVE, STR.NOTI_CONTENT_RESERVE);
+				return;
+
+			case Packet.REQ_CANCEL_RSRV:
+				// mainframe.updateMyReservations((ArrayList<Room>) packet.getData()[0]);
+				// mainframe.updateCalendar((ArrayList<Room>) packet.getData()[1]);
+				// mainframe.dialogue(0, STR.NOTI_TITLE_REQ_CANCEL_RSRV, STR.NOTI_REQ_CANCEL_RSRV);
+				break;
+
+			case Packet.OPEN_RSRV:
+				// mainframe.updateCalendar((ArrayList<Room>) packet.getData());
+				// mainframe.dialogue(0, STR.NOTI_TITLE_ACCEPTED, STR.NOTI_CONTENT_ACCEPTED);
+				break;
+				
+			case Packet.CLOSE_RSRV:
+				// mainframe.updateCalendar((ArrayList<Room>) packet.getData());
+				// mainframe.dialogue(0, STR.NOTI_TITLE_ACCEPTED, STR.NOTI_CONTENT_ACCEPTED);
+				break;
+
+			case Packet.CANCEL_RSRV:
+				// mainframe.updateCalendar((ArrayList<Room>) packet.getData());
+				// mainframe.dialogue(0, STR.NOTI_TITLE_ACCEPTED, STR.NOTI_CONTENT_ACCEPTED);
+				break;
+
+			case Packet.QUERY_RSRVS:
+				if(((ArrayList<Reservation>) packet.getData()).size() == 0); // remove semicolon when implementing
+					// mainframe.dialogue(1, STR.NOTI_TITLE_NO_RESERVATION, STR.NOTI_CONTENT_NO_RESERVATION);
+				// mainframe.updateCalendar((ArrayList<Room>) packet.getData()[1]);
+				break;
+
+			case Packet.QUERY_REGS:
+				if(((ArrayList<Account>) packet.getData()).size() == 0); // remove semicolon when implementing
+					// mainframe.dialogue(1, STR.NOTI_TITLE_NO_RESULT, STR.NOTI_CONTENT_NO_RESULT);
+				// mainframe.updateRegistrationTable((ArrayList<Room>) packet.getData());
+				break;
+
+			case Packet.ACCEPT_REG:
+				// mainframe.dialogue(0, STR.NOTI_ACCEPT_REG, STR.NOTI_ACCEPT_REG);
+				// mainframe.updateRegistrationTable((ArrayList<Room>) packet.getData());
+				break;
+
+			case Packet.REJECT_REG:
+				// mainframe.dialogue(0, STR.NOTI_REJECT_REG, STR.NOTI_REJECT_REG);
+				// mainframe.updateRegistrationTable((ArrayList<Room>) packet.getData());
+				break;
+			}
+        
 		switch(packet.getFlag())
 		{
 		case Packet._INVALID_ACNT:
+            if(context == Packet.LOGIN)
+            {
+                LoginFrame.getInstance().setEnabled(true);
+                LoginFrame.getInstance().showDialog(STR.NOTI_INVALID_ACNT);
+            }
 			// mainframe.dialogue(1, STR.NOTI_TITLE_INVALID_ACNT, STR.NOTI_CONTENT_INVALID_ACNT);
 			break;
 

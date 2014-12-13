@@ -25,7 +25,7 @@ public class AccountManager
 		Account client = searchAccount(id);
 		
 		if(client == null) return 0;						// not found
-		if(client.getPw() == pw) return client.getType();	// valid
+		if(client.getPw().equals(pw)) return client.getType();	// valid
 		return 0;											// invalid
 	}
 

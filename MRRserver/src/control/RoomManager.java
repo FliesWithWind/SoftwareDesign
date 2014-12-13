@@ -216,16 +216,19 @@ public class RoomManager
 
 	private ArrayList<Room> searchByAvailability(ArrayList<Room> targetlist, boolean availability)
 	{
+		if(!availability) return targetlist;
+		
 		ArrayList<Room> result = new ArrayList<Room>();
 		
 		for(Room room : targetlist)
+		{
 			for(Reservation reservation : room.getReservations())
-				if((reservation.getClient() != null) == availability)
+				if(!reservation.isReserved())
 				{
 					result.add(room);
 					break;
 				}
-		
+		}
 		return result;
 	}
 
