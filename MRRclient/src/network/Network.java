@@ -78,6 +78,7 @@ public class Network implements Runnable
 	{
 		connect(IP, PORT);			// connect		
 		os.writeObject(packet);		// send message
+		packetprocessor.setContext(packet.getFlag());
 		(new Thread(this)).start(); // run receiver
 	}
 	

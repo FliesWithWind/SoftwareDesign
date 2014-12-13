@@ -18,9 +18,9 @@ public class ReservationManager
 	// not found	: returns 1
 	// passed date	: returns 2
 	// occupied		: returns 3
-	public int reserve(String roomid, long date, Account account) throws Exception
+	public int reserve(Room room, long date, Account account) throws Exception
 	{
-		Reservation temp = searchReservation(roomid, date);
+		Reservation temp = searchReservation(room, date);
 
 		if(temp == null)					return 1; // check null
 		if(date < DateTeller.getToday())	return 2; // check if passed date
@@ -33,26 +33,24 @@ public class ReservationManager
 		return 0;
 	}
 	
-	public Reservation searchReservation(String roomname, long date)
+	public Reservation searchReservation(Room room, long date)
 	{
-		for(Reservation iter : list) 				// iterates in reservation list
-			if(iter.getRoom().getName().equals(roomname) && iter.getDate() == date) return iter;
+		for(Reservation iter : room.getReservations())	// iterates in reservation list
+			if(iter.getDate() == date) return iter;
 		
-		return null; 								// not found
+		return null; 									// not found
 	}
 	
 	/*** turn on reqcancel of the reservation ***/
 	// success		: returns 0
 	// not found	: returns 1
 	// passed date	: returns 2
-	public int requestCancelReservation(String roomid, long date)
+	public int requestCancelReservation(Reservation rsrv)
 	{
-		Reservation temp = searchReservation(roomid, date);
-
-		if(temp == null) 					return 1;	// check null - not found
-		if(date < DateTeller.getToday())	return 2;	// check if passed date
+		if(rsrv == null) 							return 1;	// check null - not found
+		if(rsrv.getDate() < DateTeller.getToday())	return 2;	// check if passed date
 		
-		temp.setReqcancel(true);	// set requested for canceled
+		rsrv.setReqcancel(true);	// set requested for canceled
 		return 0;
 	}
 
@@ -64,7 +62,7 @@ public class ReservationManager
 	// passed date	: returns 4
 	public int openReservation(Reservation inf, Room room) throws Exception
 	{
-		Reservation temp = searchReservation(inf.getRoom().getName(), inf.getDate());
+		Reservation temp = searchReservation(inf.getRoom(), inf.getDate());
 
 		if(temp != null)							return 1; // check duplication
 		if(inf.getDate() < DateTeller.getToday())	return 2; // check if passed date
@@ -83,17 +81,15 @@ public class ReservationManager
 	// not found	: returns 1
 	// passed date	: returns 2
 	// occupied		: returns 3
-	public int closeReservation(String roomid, long date)
+	public int closeReservation(Reservation rsrv)
 	{
-		Reservation temp = searchReservation(roomid, date);
-
-		if(temp == null)					return 1; // check null
-		if(date < DateTeller.getToday())	return 2; // check if passed date
-		if(temp.isReserved())				return 3; // check if valid form
+		if(rsrv == null)							return 1; // check null
+		if(rsrv.getDate() < DateTeller.getToday())	return 2; // check if passed date
+		if(rsrv.isReserved())						return 3; // check if valid form
 		
-		temp.getRoom().getReservations().remove(temp);	// remove rsrv from the room obj
-		list.remove(temp);								// remove rsrv from the list
-		temp = null;
+		rsrv.getRoom().getReservations().remove(rsrv);	// remove rsrv from the room obj
+		list.remove(rsrv);								// remove rsrv from the list
+		rsrv = null;
 		
 		return 0;
 	}
@@ -103,18 +99,16 @@ public class ReservationManager
 	// not found		: returns 1
 	// passed date		: returns 2
 	// not reqcancel	: returns 3
-	public int cancelReservation(String roomid, long date)
+	public int cancelReservation(Reservation rsrv)
 	{
-		Reservation temp = searchReservation(roomid, date);
+		if(rsrv == null)							return 1; // check null
+		if(rsrv.getDate() < DateTeller.getToday())	return 2; // check if passed date
+		if(!rsrv.isReqcancel())						return 3; // check if valid form
 
-		if(temp == null)					return 1; // check null
-		if(date < DateTeller.getToday())	return 2; // check if passed date
-		if(!temp.isReqcancel())				return 3; // check if valid form
-
-		temp.getClient().getMyreservations().remove(temp);	// remove rsrv from the client obj
-		temp.setClient(null);								// remove client from the rsrv obj
-		temp.setReserved(false);							// set unreserved
-		temp.setReqcancel(false);							// recover reqcancel to be false
+		rsrv.getClient().getMyreservations().remove(rsrv);	// remove rsrv from the client obj
+		rsrv.setClient(null);								// remove client from the rsrv obj
+		rsrv.setReserved(false);							// set unreserved
+		rsrv.setReqcancel(false);							// recover reqcancel to be false
 		return 0;
 	}
 		

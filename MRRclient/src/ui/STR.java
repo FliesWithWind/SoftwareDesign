@@ -17,16 +17,19 @@ public class STR
 	NOTI_CONTENT_ACCEPTED			= "The request was submitted successfully.",
 	
 	NOTI_TITLE_INVALID_ACNT			= "Invalid Account",
-	NOTI_CONTENT_INVALID_ACNT		= "Submitted ID and Password are invalid.",
+	NOTI_CONTENT_INVALID_ACNT		= "The account is not registered or submitted information is wrong.",
 			
 	NOTI_TITLE_INVALID_ACCESS		= "Invalid Access",
 	NOTI_CONTENT_INVALID_ACCESS		= "You are not authorized for the request.",
 			
 	NOTI_TITLE_REJECTED				= "Rejected",
+	
+	NOTI_TITLE_UNKNOWN				= "Unknown Massage",
+	NOTI_CONTENT_UNKNOWN			= "Server received unknown message.",
 			
 	NOTI_TITLE_OUTDATED_VERSION		= "Outdated version",
-	NOTI_CONTENT_OUTDATED_VERSION	= "Your application version is outdated." + 
-									  "Please update your application.",
+	NOTI_CONTENT_OUTDATED_VERSION	= "Please update application." + 
+									  "The newest version is ",
 										
 	NOTI_TITLE_CREATE_ROOM			= "Room Created",
 	NOTI_CONTENT_CREATE_ROOM		= "The new room was created successfully.",

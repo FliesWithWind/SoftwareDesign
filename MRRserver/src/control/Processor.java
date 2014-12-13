@@ -64,8 +64,16 @@ public class Processor
 		System.out.println("Packet recieved: " + packet.getFlag());
 
 		int result; // manager's error count
-		Account tempacc;
-		Room temproom;
+		Account 	tempacc;
+		Reservation	temprsrv;
+		Room 		temproom;
+
+		ArrayList<Reservation> 	temprsrvl;
+		ArrayList<Reservation> 	temprsrvl2;
+		ArrayList<Room> 		temprooml;
+		ArrayList<Reservation> temprsrvlarr[] = new ArrayList[2];
+				
+		long tempdate;
 		
 		/*** Request that doesn't require account validation ***/
 		if(packet.getFlag() == Packet.REGISTER)
@@ -74,7 +82,6 @@ public class Processor
 			if(result != 0) return new Packet(Packet._REJECTED, null, null, result);
 			
 			return new Packet(Packet._ACCEPTED, null, null, null);
-			break;
 		}
 		
 		// Account validation
@@ -87,7 +94,7 @@ public class Processor
 		case Packet.LOGIN: // version check
 			if(!((String)packet.getData()).equals(CURRENT_VERSION))
 				return new Packet(Packet._OUTDATED_VERSION, null, null, CURRENT_VERSION);
-			return new Packet(Packet._LOGIN, null, null, null);
+			return new Packet(Packet._ACCEPTED, null, null, null);
 			
 		case Packet.MY_ACNT: // authority check > send account
 			if(acctype != 3) if(!packet.getId().equals((String)packet.getData()))
@@ -95,19 +102,19 @@ public class Processor
 			tempacc = (Account) accountmanager.searchAccount(packet.getId()).clone();
 			tempacc.setMyrooms(null);
 			tempacc.setMyreservations(null);
-			return new Packet(Packet._MY_ACNT, null, null, tempacc);
+			return new Packet(Packet._ACCEPTED, null, null, tempacc);
 			
 		case Packet.EDIT_ACNT: // authority check
 			if(acctype != 3) if(!packet.getId().equals(((Account)packet.getData()).getId()))
 				return new Packet(Packet._INVALID_ACCESS, null, null, null);
 			result = accountmanager.editAccount((Account)packet.getData());
 			if(result != 0) return new Packet(Packet._REJECTED, null, null, result);
-			return new Packet(Packet._ACCEPTED,null,null,null);
+			return new Packet(Packet._ACCEPTED, null, null, null);
 			
 		case Packet.MY_RSRVS:
 			if(acctype != 3) if(!packet.getId().equals((String)packet.getData()))
 				return new Packet(Packet._INVALID_ACCESS, null, null, null);
-			ArrayList<Reservation> temprsrvl = new ArrayList<Reservation>();
+			temprsrvl = new ArrayList<Reservation>();
 			for(Reservation iter : accountmanager.searchAccount((String)packet.getData()).getMyreservations())
 			{
 				Reservation element = (Reservation) iter.clone();
@@ -116,57 +123,190 @@ public class Processor
 				element.getRoom().setReservations(null);
 				temprsrvl.add(element);
 			}
-			return new Packet(Packet._MY_RSRVS, null, null, temprsrvl);
+			return new Packet(Packet._ACCEPTED, null, null, temprsrvl);
 
 		case Packet.RESERVE:
-			
-			break;
+			if(acctype != 3) if(!packet.getId().equals(((String[])packet.getData())[0]))
+				return new Packet(Packet._INVALID_ACCESS, null, null, null);
+			tempacc = accountmanager.searchAccount(((String[])packet.getData())[0]);
+			temproom = roommanager.searchRoom(((String[])packet.getData())[1]);
+			tempdate = Long.parseLong(((String[])packet.getData())[2]);
+			result = reservationmanager.reserve(temproom, tempdate, tempacc);
+			if(result != 0) return new Packet(Packet._REJECTED, null, null, result);
+			// send my reservation and reservations of the room
+			temprsrvlarr[0] = new ArrayList<Reservation>();
+			for(Reservation iter : tempacc.getMyreservations())
+			{
+				Reservation element = (Reservation) iter.clone();
+				element.setClient(null);
+				element.getRoom().setOwner(null);
+				element.getRoom().setReservations(null);
+				temprsrvlarr[0].add(element);
+			}
+			tempdate = Long.parseLong(((String[])packet.getData())[2]);
+			temprsrvlarr[1] = new ArrayList<Reservation>();
+			for(Reservation iter : temproom.getReservations())
+				if(iter.getDate() > tempdate - 31 && iter.getDate() < tempdate + 31)
+				{
+					Reservation element = (Reservation) iter.clone();
+					element.setClient(null);
+					element.getRoom().setOwner(null);
+					element.getRoom().setReservations(null);
+					temprsrvlarr[1].add(element);
+				}
+			return new Packet(Packet._ACCEPTED, null, null, temprsrvlarr);
 			
 		case Packet.REQ_CANCEL_RSRV:
-			
-			break;
+			tempdate = Long.parseLong(((String[])packet.getData())[1]);
+			temproom = roommanager.searchRoom(((String[])packet.getData())[0]);
+			temprsrv = reservationmanager.searchReservation(temproom, tempdate);
+			if(acctype != 3) if(!packet.getId().equals(temprsrv.getClient().getId()))
+				return new Packet(Packet._INVALID_ACCESS, null, null, null);
+			result = reservationmanager.requestCancelReservation(temprsrv);
+			if(result != 0) return new Packet(Packet._REJECTED, null, null, result);
+			// send my reservation and reservations of the room
+			temprsrvlarr[0] = new ArrayList<Reservation>();
+			for(Reservation iter : temprsrv.getClient().getMyreservations())
+			{
+				Reservation element = (Reservation) iter.clone();
+				element.setClient(null);
+				element.getRoom().setOwner(null);
+				element.getRoom().setReservations(null);
+				temprsrvlarr[0].add(element);
+			}
+			temprsrvlarr[1] = new ArrayList<Reservation>();
+			for(Reservation iter : temproom.getReservations())
+				if(	iter.getDate() > tempdate - 31 && iter.getDate() < tempdate + 31)
+				{
+					Reservation element = (Reservation) iter.clone();
+					element.setClient(null);
+					element.getRoom().setOwner(null);
+					element.getRoom().setReservations(null);
+					temprsrvlarr[1].add(element);
+				}
+			return new Packet(Packet._ACCEPTED, null, null, temprsrvlarr);
 			
 		case Packet.OPEN_RSRV:
-			
-			break;
+			temprsrv = (Reservation)packet.getData();
+			temproom = roommanager.searchRoom(temprsrv.getRoom().getName());
+			if(acctype != 3) if(!packet.getId().equals(temproom.getOwner().getId()))
+				return new Packet(Packet._INVALID_ACCESS, null, null, null);
+			result = reservationmanager.openReservation(temprsrv, temproom);
+			if(result != 0) return new Packet(Packet._REJECTED, null, null, result);
+			// send reservations of the room
+			temprsrvl = new ArrayList<Reservation>();
+			for(Reservation iter : temproom.getReservations())
+				if(	iter.getDate() >= temprsrv.getDate() - 31 && 
+					iter.getDate() <= temprsrv.getDate() + 31)
+				{
+					Reservation element = (Reservation) iter.clone();
+					element.setClient(null);
+					element.getRoom().setOwner(null);
+					element.getRoom().setReservations(null);
+					temprsrvl.add(element);
+				}
+			return new Packet(Packet._ACCEPTED, null, null, temprsrvl);	
 			
 		case Packet.CLOSE_RSRV:
-			
-			break;
+			tempdate = Long.parseLong(((String[])packet.getData())[1]);
+			temproom = roommanager.searchRoom(((String[])packet.getData())[0]);
+			temprsrv = reservationmanager.searchReservation(temproom, tempdate);
+			if(acctype != 3) if(!packet.getId().equals(temproom.getOwner().getId()))
+				return new Packet(Packet._INVALID_ACCESS, null, null, null);
+			result = reservationmanager.closeReservation(temprsrv);
+			if(result != 0) return new Packet(Packet._REJECTED, null, null, result);
+			// send reservations of the room
+			temprsrvl = new ArrayList<Reservation>();
+			for(Reservation iter : temproom.getReservations())
+				if(	iter.getDate() >= temprsrv.getDate() - 31 && 
+					iter.getDate() <= temprsrv.getDate() + 31)
+				{
+					Reservation element = (Reservation) iter.clone();
+					element.setClient(null);
+					element.getRoom().setOwner(null);
+					element.getRoom().setReservations(null);
+					temprsrvl.add(element);
+				}
+			return new Packet(Packet._ACCEPTED, null, null, temprsrvl);	
 			
 		case Packet.CANCEL_RSRV:
+			temproom = roommanager.searchRoom(((String[])packet.getData())[0]);
+			temprsrv = reservationmanager.searchReservation(temproom,
+					Long.parseLong(((String[])packet.getData())[1]));
+			if(acctype != 3) if(!packet.getId().equals(temprsrv.getRoom().getOwner().getId()))
+				return new Packet(Packet._INVALID_ACCESS, null, null, null);
+			result = reservationmanager.cancelReservation(temprsrv);
+			if(result != 0) return new Packet(Packet._REJECTED, null, null, result);
+			// send reservations of the room
+			temprsrvl = new ArrayList<Reservation>();
+			for(Reservation iter : temproom.getReservations())
+				if(	iter.getDate() >= temprsrv.getDate() - 31 && 
+					iter.getDate() <= temprsrv.getDate() + 31)
+				{
+					Reservation element = (Reservation) iter.clone();
+					element.setClient(null);
+					element.getRoom().setOwner(null);
+					element.getRoom().setReservations(null);
+					temprsrvl.add(element);
+				}
+			return new Packet(Packet._ACCEPTED, null, null, temprsrvl);	
 			
-			break;		
-
 		case Packet.SEARCH_ROOMS:
+			temprooml = roommanager.primarySearch((Reservation)packet.getData());
+			if(temprooml != null) return new Packet(Packet._SEARCH_PRI, null, null, temprooml);
+			temprooml = roommanager.secondarySearch((Reservation)packet.getData());
+			return new Packet(Packet._SEARCH_SEC, null, null, temprooml);
 			
-			break;
+		case Packet.QUERY_RSRVS:
+			temproom = roommanager.searchRoom(((String[])packet.getData())[0]);
+			tempdate = Long.parseLong(((String[])packet.getData())[1]);
+			temprsrvl = new ArrayList<Reservation>();
+			for(Reservation iter : temproom.getReservations())
+				if(iter.getDate() >= tempdate - 31 && iter.getDate() <= tempdate + 31)
+				{
+					Reservation element = (Reservation) iter.clone();
+					element.setClient(null);
+					element.getRoom().setOwner(null);
+					element.getRoom().setReservations(null);
+					temprsrvl.add(element);
+				}
+			return new Packet(Packet._ACCEPTED, null, null, temprsrvl);	
 		}
 		
 		/*** Requests those requires staff authority ***/
-		if(acctype == 1) return new Packet(Packet._INVALID_ACNT, null, null, null);
+		if(acctype == 1) return new Packet(Packet._INVALID_ACCESS, null, null, null);
 		switch(packet.getFlag())
 		{
 		case Packet.MY_ROOMS:
 			if(acctype != 3) if(!packet.getId().equals((String)packet.getData()))
 				return new Packet(Packet._INVALID_ACCESS, null, null, null);
-			ArrayList<Room> temprl = new ArrayList<Room>();
+			temprooml = new ArrayList<Room>();
 			for(Room iter : accountmanager.searchAccount((String)packet.getData()).getMyrooms())
 			{
 				Room element = (Room) iter.clone();
 				element.setOwner(null);
 				element.setReservations(null);
-				temprl.add(element);
+				temprooml.add(element);
 			}
-			return new Packet(Packet._MY_ROOMS, null, null, temprl);
+			return new Packet(Packet._ACCEPTED, null, null, temprooml);
 			
 		case Packet.CREATE_ROOM:
-			if(acctype != 3) if(!packet.getId().equals(((Room)packet.getData()).getOwner().getId()))
+			temproom = (Room)packet.getData();
+			if(acctype != 3) if(!packet.getId().equals(temproom.getOwner().getId()))
 				return new Packet(Packet._INVALID_ACCESS, null, null, null);
-			Account owner = accountmanager.searchAccount(((Room)packet.getData()).getOwner().getId());
-			result = roommanager.createRoom((Room)packet.getData(), owner);
+			Account owner = accountmanager.searchAccount(temproom.getOwner().getId());
+			result = roommanager.createRoom(temproom, owner);
 			if(result != 0) return new Packet(Packet._REJECTED, null, null, result);
-			return new Packet(Packet._ACCEPTED,null,null,null);
+			// send my rooms
+			temprooml = new ArrayList<Room>();
+			for(Room iter : temproom.getOwner().getMyrooms())
+			{
+				Room element = (Room) iter.clone();
+				element.setOwner(null);
+				element.setReservations(null);
+				temprooml.add(element);
+			}
+			return new Packet(Packet._ACCEPTED, null, null, temprooml);
 			
 		case Packet.EDIT_ROOM:
 			temproom = roommanager.searchRoom(((Room)packet.getData()).getName());
@@ -174,7 +314,16 @@ public class Processor
 				return new Packet(Packet._INVALID_ACCESS, null, null, null);
 			result = roommanager.editRoom((Room)packet.getData());
 			if(result != 0) return new Packet(Packet._REJECTED, null, null, result);
-			return new Packet(Packet._ACCEPTED,null,null,null);
+			// send my rooms
+			temprooml = new ArrayList<Room>();
+			for(Room iter : temproom.getOwner().getMyrooms())
+			{
+				Room element = (Room) iter.clone();
+				element.setOwner(null);
+				element.setReservations(null);
+				temprooml.add(element);
+			}
+			return new Packet(Packet._ACCEPTED, null, null, temprooml);
 			
 		case Packet.REMOVE_ROOM:
 			temproom = roommanager.searchRoom((String)packet.getData());
@@ -182,37 +331,36 @@ public class Processor
 				return new Packet(Packet._INVALID_ACCESS, null, null, null);
 			result = roommanager.removeRoom((String)packet.getData());
 			if(result != 0) return new Packet(Packet._REJECTED, null, null, result);
-			return new Packet(Packet._ACCEPTED,null,null,null);
+			// send my rooms
+			temprooml = new ArrayList<Room>();
+			for(Room iter : temproom.getOwner().getMyrooms())
+			{
+				Room element = (Room) iter.clone();
+				element.setOwner(null);
+				element.setReservations(null);
+				temprooml.add(element);
+			}
+			return new Packet(Packet._ACCEPTED, null, null, temprooml);
 		}
 		
 		/*** Requests those requires manager authority ***/
-		if(acctype == 2) return new Packet(Packet._INVALID_ACNT, null, null, null);
+		if(acctype == 2) return new Packet(Packet._INVALID_ACCESS, null, null, null);
 		switch(packet.getFlag())
 		{
 		case Packet.QUERY_REGS:
-			return new Packet(Packet._QUERY_REGS,null,null,accountmanager.getRegisterList());
-			//break;
+			return new Packet(Packet._ACCEPTED, null, null, accountmanager.getRegisterList());
 			
 		case Packet.ACCEPT_REG:
-			if(packet.getData()!=null)
-				if(accountmanager.acceptRegistration((String)packet.getData()))
-					return new Packet(Packet._ACCEPTED,null,null,null);
-				else
-					return new Packet(Packet._REJECTED,null,null,null);
-			break;
+			result = accountmanager.acceptRegistration((String)packet.getData());
+			if(result != 0) return new Packet(Packet._REJECTED, null, null, result);
+			return new Packet(Packet._ACCEPTED, null, null, accountmanager.getRegisterList());
 			
 		case Packet.REJECT_REG:
-			if(packet.getData()!=null)
-				if(accountmanager.rejectRegistration((String)packet.getData()))
-					return new Packet(Packet._ACCEPTED,null,null,null);
-				else
-					return new Packet(Packet._REJECTED,null,null,null);
-			break;
-			
-			
-		case Packet.QUERY_RSRVS:
-				return new Packet(Packet._QUERY_RSRVS,null,null,reservationmanager.getList());	
+			result = accountmanager.rejectRegistration((String)packet.getData());
+			if(result != 0) return new Packet(Packet._REJECTED, null, null, result);
+			return new Packet(Packet._ACCEPTED, null, null, accountmanager.getRegisterList());
 		}
-		
+
+		return new Packet(Packet._UNKNOWN, null, null, null);
 	}
 }

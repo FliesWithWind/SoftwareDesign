@@ -47,6 +47,7 @@ public class RoomManager
 	// success		: returns 0
 	// not found	: returns 1
 	// invalid form	: returns 2
+	// editing room name is not allowed
 	public int editRoom(Room inf) throws Exception
 	{
 		Room tmp = searchRoom(inf.getName());
@@ -54,7 +55,6 @@ public class RoomManager
 		if(tmp == null)				return 1; // check null
 		if(!validateRoomForm(inf))	return 2; // check if valid form
 
-		tmp.setName(inf.getName());
 		tmp.setCity(inf.getCity());
 		tmp.setLocation(inf.getLocation());
 		tmp.setDefault_rentcost(inf.getDefault_rentcost());
@@ -105,16 +105,16 @@ public class RoomManager
 	/*** search by search options contained in Room object, Reservation object ***/
 	// found		: returns searched list
 	// not found	: returns zero length list
-	public ArrayList<Room> primarySearch(Room roominf, Reservation reservationinf) throws Exception
+	public ArrayList<Room> primarySearch(Reservation reservationinf) throws Exception
 	{
 		ArrayList<Room> targetlist = list;
 		
-		targetlist = searchByName			(targetlist, roominf.getName());
+		targetlist = searchByName			(targetlist, reservationinf.getRoom().getName());
 		targetlist = searchByDate			(targetlist, reservationinf.getDate());
-		targetlist = searchByLocation		(targetlist, roominf.getLocation());
-		targetlist = searchByMaxcapacity	(targetlist, roominf.getMaxcapacity());
+		targetlist = searchByLocation		(targetlist, reservationinf.getRoom().getLocation());
+		targetlist = searchByMaxcapacity	(targetlist, reservationinf.getRoom().getMaxcapacity());
 		targetlist = searchByRentcost		(targetlist, reservationinf.getRentcost());
-		targetlist = searchByCity			(targetlist, roominf.getCity());
+		targetlist = searchByCity			(targetlist, reservationinf.getRoom().getCity());
 		targetlist = searchByAvailability	(targetlist, reservationinf.getClient() == null);
 		
 		return targetlist;
@@ -124,18 +124,18 @@ public class RoomManager
 	// search by date performs with around interval (DATE_AROUND_INTERVAL)
 	// found		: returns searched list
 	// not found	: returns zero length list
-	public ArrayList<Room> secondarySearch(Room roominf, Reservation reservationinf)
+	public ArrayList<Room> secondarySearch(Reservation reservationinf)
 	{
 		ArrayList<Room> targetlist = list;
 		ArrayList<Room> templist;
 		
-		targetlist = searchByName			(targetlist, roominf.getName());
+		targetlist = searchByName			(targetlist, reservationinf.getRoom().getName());
 		targetlist = searchByDateAround		(targetlist, reservationinf.getDate());
-		targetlist = searchByMaxcapacity	(targetlist, roominf.getMaxcapacity());
+		targetlist = searchByMaxcapacity	(targetlist, reservationinf.getRoom().getMaxcapacity());
 		targetlist = searchByRentcost		(targetlist, reservationinf.getRentcost());
-		targetlist = searchByCity			(targetlist, roominf.getCity());
+		targetlist = searchByCity			(targetlist, reservationinf.getRoom().getCity());
 		targetlist = searchByAvailability	(targetlist, reservationinf.getClient() == null);
-		templist   = searchByLocation		(targetlist, roominf.getLocation());
+		templist   = searchByLocation		(targetlist, reservationinf.getRoom().getLocation());
 
 		// if there's no result that searched by location,
 		// returns list not searched by location

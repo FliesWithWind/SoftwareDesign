@@ -18,58 +18,36 @@ public class Packet implements Serializable
 	REGISTER 			= 11,	// Request to register
 	EDIT_ACNT			= 12,	// Edit my account properties
 	/* Room */
-	MY_ROOMS			= 20,	// View my room list								(Staff)
-	CREATE_ROOM			= 21,	// Create new room									(Staff)
-	EDIT_ROOM			= 22,	// Edit room properties								(Staff)
-	REMOVE_ROOM			= 23,	// Remove room										(Staff)
+	MY_ROOMS			= 15,	// View my room list								(Staff)
+	CREATE_ROOM			= 16,	// Create new room									(Staff)
+	EDIT_ROOM			= 17,	// Edit room properties								(Staff)
+	REMOVE_ROOM			= 18,	// Remove room										(Staff)
 	/* Reservation - User */
-	MY_RSRVS			= 30,	// View reservation list I reserved					(User)
-	RESERVE				= 31,	// Reserve a room at a certain date					(User)
-	REQ_CANCEL_RSRV		= 34,	// Request to cancel a certain reservation			(User)
+	MY_RSRVS			= 20,	// View reservation list I reserved					(User)
+	RESERVE				= 21,	// Reserve a room at a certain date					(User)
+	REQ_CANCEL_RSRV		= 22,	// Request to cancel a certain reservation			(User)
 	/* Reservation - Staff */
-	OPEN_RSRV			= 41,	// Open a room in a certain date to be leased		(Staff)
-	CLOSE_RSRV			= 43,	// Close a room not to be leased					(Staff)
-	CANCEL_RSRV			= 44,	// Cancel a reservation requested to be canceled	(Staff)
+	OPEN_RSRV			= 25,	// Open a room in a certain date to be leased		(Staff)
+	CLOSE_RSRV			= 26,	// Close a room not to be leased					(Staff)
+	CANCEL_RSRV			= 27,	// Cancel a reservation requested to be canceled	(Staff)
 	/* Managing registration */
-	QUERY_REGS			= 51,	// Query for requests for registration				(Manager)
-	ACCEPT_REG			= 52,	// Accept registration								(Manager)
-	REJECT_REG			= 53,	// Reject registration								(Manager)
+	QUERY_REGS			= 31,	// Query for requests for registration				(Manager)
+	ACCEPT_REG			= 32,	// Accept registration								(Manager)
+	REJECT_REG			= 33,	// Reject registration								(Manager)
 	/* Searching room & Querying reservations */
-	SEARCH_ROOMS		= 100,	// Search rooms
-	QUERY_RSRVS			= 105,	// Query reservations on a certain room
+	SEARCH_ROOMS		= 35,	// Search rooms
+	QUERY_RSRVS			= 36,	// Query reservations on a certain room
 	/******************************* Flag List - Server Side *******************************/
 	/* Simple Messages */
 	_ACCEPTED 			= 0,	// Simple positive (= Yes)
-	_LOGIN				= 1,	// Log in ID-PW is valid
-	_INVALID_ACNT 		= -1,	// Invalid ID-PW
-	_INVALID_ACCESS		= -2,	// Invalid authorization
-	_REJECTED 			= -3,	// Rejected by server control (e.g : request on deleted room)
-	_OUTDATED_VERSION	= -9,	// Needed to be updated (For further maintenance)
-	/* Account */
-	_MY_ACNT			= 10,	// Your account properties
-	//_REGISTER 		= 11,	// Response with _ACCEPTED and _REJECTED
-	//_EDIT_ACNT		= 12,	// Response with _ACCEPTED and _REJECTED
-	/* Room */
-	_MY_ROOMS			= 20,	// Your room list
-	_CREATE_ROOM		= 21,	// Your room list
-	_EDIT_ROOM			= 22,	// Your room list
-	//_REMOVE_ROOM		= 23,	// Response with _ACCEPTED and _REJECTED
-	/* Reservation - User */
-	_MY_RSRVS			= 30,	// [0] - Your Reservations, [1] - Reservation list of a room
-	_RESERVE			= 31,	// [0] - Your Reservations, [1] - Reservation list of a room
-	_REQ_CANCEL_RSRV	= 34,	// [0] - Your Reservations, [1] - Reservation list of a room
-	/* Reservation - Staff */
-	_OPEN_RSRV			= 41,	// List of reservations on a certain room
-	_CLOSE_RSRV			= 43,	// List of reservations on a certain room
-	_CANCEL_RSRV		= 44,	// List of reservations on a certain room
-	/* Managing registration */
-	_QUERY_REGS			= 51,	// List of Requests of registration
-	_ACCEPT_REG			= 52,	// List of Requests of registration
-	_REJECT_REG			= 53,	// List of Requests of registration
+	_REJECTED 			= 1,	// Rejected by server control (e.g : request on deleted room)
+	_INVALID_ACNT 		= 2,	// Invalid ID-PW
+	_INVALID_ACCESS		= 3,	// Invalid authorization
+	_UNKNOWN			= 4,	// Unknown flag
+	_OUTDATED_VERSION	= 5,	// Needed to be updated (For further maintenance)
 	/* Searching room & Querying reservations */
-	_SEARCH_PRI			= 101,	// These data are primary searched result
-	_SEARCH_SEC			= 102,	// These data are secondary searched result
-	_QUERY_RSRVS		= 105;	// List of reservations on a certain room
+	_SEARCH_PRI			= 6,	// These data are primary searched result
+	_SEARCH_SEC			= 7;	// These data are secondary searched result
 	/***************************************************************************************/
 		
 	public Packet(int flag, String id, String pw, Object data)
