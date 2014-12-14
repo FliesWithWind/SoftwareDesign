@@ -117,28 +117,27 @@ public class AccountManager
 	// invalid	: false
 	private boolean validateAccountForm(Account inf) throws Exception
 	{
-		Pattern p = Pattern.compile("[^a-zA-Z0-9]");
-		if(p.matcher(inf.getId()).find())		return false; // check if ID's alphanumeric
-		if(p.matcher(inf.getPw()).find())		return false; // check if PW's alphanumeric
-		
-		int type = inf.getType();
-		if(type > 3 || type < 1)				return false; // check type's range
-		
-		String nametemp = inf.getName();
-		nametemp = nametemp.replace(" ", "");
-		if(nametemp.equals(""))					return false; // check if name's just blank
-		
-		if(	!inf.getEmail().contains("@") ||
-			!inf.getEmail().contains("."))		return false; // check if email contains @, .
-		
-		p = Pattern.compile("^[[0-9]+[-]]");
-		if(p.matcher(inf.getPhonenum()).find())	return false; // check if Phonenum's numeric
+        Pattern p = Pattern.compile("[^a-zA-Z0-9]");
+        if(p.matcher(inf.getId()).find())		return false; // check if ID's alphanumeric
+        if(p.matcher(inf.getPw()).find())		return false; // check if PW's alphanumeric
 
-		String univ_comptemp = inf.getUniv_comp();				
-		univ_comptemp.replace(" ", "");
-		if(univ_comptemp.equals(""))			return false; // check if univ_comp's just blank
-		
-		return true;
+        int type = inf.getType();
+        if(type > 3 || type < 1)				return false; // check type's range
+
+        String nametemp = inf.getName();
+        nametemp = nametemp.replace(" ", "");
+        if(nametemp.equals(""))					return false; // check if name's just blank
+
+        if(	!inf.getEmail().contains("@") ||
+                !inf.getEmail().contains("."))		return false; // check if email contains @, .
+
+        p = Pattern.compile("/^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}/");
+        if(p.matcher(inf.getPhonenum()).find())	return false; // check if Phonenum's numeric
+        String univ_comptemp = inf.getUniv_comp();				
+        univ_comptemp.replace(" ", "");
+        if(univ_comptemp.equals(""))			return false; // check if univ_comp's just blank
+
+        return true;
 	}
 	
 	public ArrayList<Account> getRegisterList()

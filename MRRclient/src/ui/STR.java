@@ -8,14 +8,29 @@ public class STR
 	public static final String
 	CURRENT_VERSION	= "0.5",
 
+    CONFIRM_TITLE           = "Are you sure?",
+    CONFIRM_CONTENT         = "Are you sure with the request to submit?",
+    
+	/***************************************************************************/
+    
 	NOTI_ACCEPTED           = "The request was submitted successfully.",
+    NOTI_REJECTED           = "The request was rejected by the system.",
             
 	NOTI_CONNECTION_ERROR	= "Connection Error",
-            
+    
     NOTI_INVALID_FORM       = "Written form is invalid. Please check again.",       
     NOTI_SHORT_IDPW         = "Lengths of ID and PW have to be longer than 4 at least.",
-            
+    
 	NOTI_INVALID_ACNT		= "The account is not registered or submitted information is wrong.",
+    
+    NOTI_DUP_ACCLIST        = "There is the same ID already registered.",
+    NOTI_DUP_REGLIST        = "There is the same ID requested for registration.",
+    
+	NOTI_NO_RESULT			= "There is no result for the query.",
+    
+    NOTI_NOT_REGISTERED_ACC = "The account is not registered.",
+            
+    NOTI_NOT_SELECTED       = "Please select an item.",
             
 	/***************************************************************************/
 	
@@ -50,9 +65,6 @@ public class STR
 	NOTI_TITLE_REJECT_REG			= "Accepted",
 	NOTI_CONTENT_REJECT_REG			= "The rejecting request was submitted successfully.",
 			
-	NOTI_TITLE_NO_RESULT			= "No Result",
-	NOTI_CONTENT_NO_RESULT			= "There is no result for the query.",
-	
 	NOTI_TITLE_NO_RESERVATION		= "No Record",
 	NOTI_CONTENT_NO_RESERVATION		= "There is no record on the room.";
 }

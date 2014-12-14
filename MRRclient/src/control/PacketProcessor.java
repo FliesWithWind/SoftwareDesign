@@ -18,11 +18,12 @@ public class PacketProcessor
 		return self;											//
 	}/////////////////////////////////////////////////////////////
 	
-	private MainFrame Mainframe;
 	private int context;
 
 	public void process(Packet packet)
 	{
+        String msg = "";
+        
 		if(packet.getFlag() == Packet._ACCEPTED)
 			switch(context)
 			{
@@ -34,7 +35,8 @@ public class PacketProcessor
                 break;
 
 			case Packet.MY_ACNT:
-				// mainframe.updateAccountSection((Account) packet.getData());
+				MainFrame.getInstance().updateAccountSection((Account) packet.getData());
+                MainFrame.getInstance().unfreeze();
 				break;
 
 			case Packet.REGISTER:
@@ -44,7 +46,8 @@ public class PacketProcessor
                 break;
 
 			case Packet.EDIT_ACNT:
-				// mainframe.dialogue(0, STR.NOTI_TITLE_ACCEPTED, STR.NOTI_CONTENT_ACCEPTED);
+                MainFrame.getInstance().unfreeze();
+                MainFrame.getInstance().showDialog(STR.NOTI_ACCEPTED);
 				break;
 
 			case Packet.MY_ROOMS:
@@ -108,19 +111,19 @@ public class PacketProcessor
 				break;
 
 			case Packet.QUERY_REGS:
-				if(((ArrayList<Account>) packet.getData()).size() == 0); // remove semicolon when implementing
-					// mainframe.dialogue(1, STR.NOTI_TITLE_NO_RESULT, STR.NOTI_CONTENT_NO_RESULT);
-				// mainframe.updateRegistrationTable((ArrayList<Room>) packet.getData());
+                MainFrame.getInstance().updateRegList((ArrayList<Account>) packet.getData());
+                MainFrame.getInstance().updateRegSection(null);
+                MainFrame.getInstance().unfreeze();
+				if(((ArrayList<Account>) packet.getData()).size() == 0)
+                    MainFrame.getInstance().showDialog(STR.NOTI_NO_RESULT);
 				break;
 
 			case Packet.ACCEPT_REG:
-				// mainframe.dialogue(0, STR.NOTI_ACCEPT_REG, STR.NOTI_ACCEPT_REG);
-				// mainframe.updateRegistrationTable((ArrayList<Room>) packet.getData());
-				break;
-
 			case Packet.REJECT_REG:
-				// mainframe.dialogue(0, STR.NOTI_REJECT_REG, STR.NOTI_REJECT_REG);
-				// mainframe.updateRegistrationTable((ArrayList<Room>) packet.getData());
+                MainFrame.getInstance().updateRegList((ArrayList<Account>)packet.getData());
+                MainFrame.getInstance().updateRegSection(null);
+                MainFrame.getInstance().unfreeze();
+				MainFrame.getInstance().showDialog(STR.NOTI_ACCEPTED);
 				break;
 			}
 		
@@ -132,13 +135,18 @@ public class PacketProcessor
 				break;
 
 			case Packet.REGISTER:
-                RegisterFrame.getInstance().dispose();
-                LoginFrame.getInstance().setEnabled(true);
-                LoginFrame.getInstance().showDialog(STR.NOTI_ACCEPTED);
+                RegisterFrame.getInstance().setEnabled(true);
+                if((int)packet.getData() == 1) msg = STR.NOTI_DUP_ACCLIST;
+                else if((int)packet.getData() == 2) msg = STR.NOTI_DUP_REGLIST;
+                else if((int)packet.getData() == 3) msg = STR.NOTI_INVALID_FORM;
+                LoginFrame.getInstance().showDialog(msg);
                 break;
 
 			case Packet.EDIT_ACNT:
-				// mainframe.dialogue(0, STR.NOTI_TITLE_ACCEPTED, STR.NOTI_CONTENT_ACCEPTED);
+                MainFrame.getInstance().unfreeze();
+                if((int)packet.getData() == 1) msg = STR.NOTI_INVALID_FORM;
+                else if((int)packet.getData() == 1) msg = STR.NOTI_NOT_REGISTERED_ACC;
+                MainFrame.getInstance().showDialog(msg);
 				break;
 
 			case Packet.MY_ROOMS:
@@ -201,20 +209,12 @@ public class PacketProcessor
 				// mainframe.updateCalendar((ArrayList<Room>) packet.getData()[1]);
 				break;
 
-			case Packet.QUERY_REGS:
-				if(((ArrayList<Account>) packet.getData()).size() == 0); // remove semicolon when implementing
-					// mainframe.dialogue(1, STR.NOTI_TITLE_NO_RESULT, STR.NOTI_CONTENT_NO_RESULT);
-				// mainframe.updateRegistrationTable((ArrayList<Room>) packet.getData());
-				break;
-
 			case Packet.ACCEPT_REG:
-				// mainframe.dialogue(0, STR.NOTI_ACCEPT_REG, STR.NOTI_ACCEPT_REG);
-				// mainframe.updateRegistrationTable((ArrayList<Room>) packet.getData());
-				break;
-
 			case Packet.REJECT_REG:
-				// mainframe.dialogue(0, STR.NOTI_REJECT_REG, STR.NOTI_REJECT_REG);
-				// mainframe.updateRegistrationTable((ArrayList<Room>) packet.getData());
+                MainFrame.getInstance().updateRegList((ArrayList<Account>)packet.getData());
+                MainFrame.getInstance().updateRegSection(null);
+                MainFrame.getInstance().unfreeze();
+				MainFrame.getInstance().showDialog(STR.NOTI_REJECTED);
 				break;
 			}
         

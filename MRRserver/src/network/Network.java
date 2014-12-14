@@ -41,7 +41,9 @@ public class Network implements Runnable
 				Packet packet = (Packet) is.readObject();	// read from client
 				if(packet == null) break; // if client sends EOF, break the loop
 				// process packet in processor and response to client
-				os.writeObject(processor.process(packet));
+				Packet sendpacket = processor.process(packet);
+				os.writeObject(sendpacket);
+				System.out.println("Packet sent: " + sendpacket.getFlag());
 			}
 			catch(EOFException e)
 			{

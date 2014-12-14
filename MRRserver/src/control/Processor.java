@@ -358,12 +358,12 @@ public class Processor
 			
 		case Packet.ACCEPT_REG:
 			result = accountmanager.acceptRegistration((String)packet.getData());
-			if(result != 0) return new Packet(Packet._REJECTED, null, null, result);
+			if(result != 0) return new Packet(Packet._REJECTED, null, null, accountmanager.getRegisterList());
 			return new Packet(Packet._ACCEPTED, null, null, accountmanager.getRegisterList());
 			
 		case Packet.REJECT_REG:
 			result = accountmanager.rejectRegistration((String)packet.getData());
-			if(result != 0) return new Packet(Packet._REJECTED, null, null, result);
+			if(result != 0) return new Packet(Packet._REJECTED, null, null, accountmanager.getRegisterList());
 			return new Packet(Packet._ACCEPTED, null, null, accountmanager.getRegisterList());
 		}
 

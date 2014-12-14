@@ -32,6 +32,11 @@ public class PacketBuilder
 		network = Network.getInstance();
 	}
 	
+    public String getLoginId()
+    {
+        return id;
+    }
+    
     private void handleConnectionError(int flag)
     {
         switch(flag)
@@ -47,7 +52,7 @@ public class PacketBuilder
             break;
             
         default:
-            MainFrame.getInstance().unblock();
+            MainFrame.getInstance().unfreeze();
             MainFrame.getInstance().showDialog(STR.NOTI_CONNECTION_ERROR);
         }
     }
