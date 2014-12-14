@@ -24,7 +24,7 @@ public class Room implements Serializable, Cloneable
 
 	public Room(Account owner,
 				String name, int city, String location, 
-				int maxcapacity, float default_rentcost, String id)
+				int maxcapacity, float default_rentcost)
 	{
 		setOwner(owner);
 		setName(name);

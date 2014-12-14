@@ -2,17 +2,8 @@ package control;
 
 import datatype.*;
 
-import java.util.ArrayList;
-
 public class ReservationManager
 {
-	ArrayList<Reservation> list;
-	
-	public ReservationManager(ArrayList<Reservation> list)
-	{
-		this.list = list;
-	}
-
 	/*** find room with room id and date, and set client as the account ***/
 	// success		: returns 0
 	// not found	: returns 1
@@ -72,7 +63,6 @@ public class ReservationManager
 		inf.setReqcancel(false);			// set reqcancel to be false
 		inf.setRoom(room);					// set room object
 		room.getReservations().add(inf);	// add to room object's reservation list
-		list.add(inf);						// add to list
 		return 0;
 	}
 
@@ -88,7 +78,6 @@ public class ReservationManager
 		if(rsrv.isReserved())						return 3; // check if valid form
 		
 		rsrv.getRoom().getReservations().remove(rsrv);	// remove rsrv from the room obj
-		list.remove(rsrv);								// remove rsrv from the list
 		rsrv = null;
 		
 		return 0;

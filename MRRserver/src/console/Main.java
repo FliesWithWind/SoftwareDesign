@@ -12,15 +12,24 @@ public class Main
 		
 		Processor.getInstance();
 		
-		(new Thread(new network.Listener())).run();
+		Thread server = (new Thread(new network.Listener()));
+
+		server.start();
 		
 		Scanner s = new Scanner(System.in);
-		
+
 		while(true)
 		{
 	        String msg = s.nextLine();
 	        
-	        if(msg.equals("q")) return;
+	        if(msg.equals("q"))
+	        {
+	        	System.out.println("Terminating Server...");
+	        	server.interrupt();
+	        	Processor.saveData();
+	        	System.out.println("Good bye!");
+	        	System.exit(0);;
+	        }
 		}
 	}
 	

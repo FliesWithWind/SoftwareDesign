@@ -5,17 +5,22 @@ import datatype.*;
         
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 import com.toedter.calendar.*;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.awt.Color;
+import java.util.Date;
 
 public class MainFrame extends javax.swing.JFrame
 {
     private static MainFrame self;
     private static int accesstype;
+    private boolean reserving;
     
     private PacketBuilder packetbuilder;
-            
+    MyCalendar calendar;
+    
     ArrayList<Account> reglist;
     
     
@@ -47,7 +52,6 @@ public class MainFrame extends javax.swing.JFrame
         setEnabled(true);
     }
     
-    
     public void showDialog(String msg)
     {
         JOptionPane.showMessageDialog(new JFrame(), msg);
@@ -56,8 +60,8 @@ public class MainFrame extends javax.swing.JFrame
     private void refreshMyAccount()
     {
         freeze();
-        if(!editManagingId.getText().equals(""))
-            packetbuilder.myAccount(editManagingId.getText());
+        if(!editMan.getText().equals(""))
+            packetbuilder.myAccount(editMan.getText());
         packetbuilder.myAccount(packetbuilder.getLoginId());
     }
     
@@ -69,6 +73,46 @@ public class MainFrame extends javax.swing.JFrame
         editPhoneAcc.setText(inf.getPhonenum());
         editEmailAcc.setText(inf.getEmail());
         editUniv_compAcc.setText(inf.getUniv_comp());
+    }
+    
+    private void refreshMyRoomlist()
+    {
+        freeze();
+        if(!editMan.getText().equals(""))
+            packetbuilder.myRooms(editMan.getText());
+        packetbuilder.myRooms(packetbuilder.getLoginId());
+    }
+    
+    public void updateMyRoomlist(ArrayList<Room> list)
+    {
+        String[] temp = new String[list.size()];
+        
+        int i = 0;
+        for(Room iter : list) temp[i++] = iter.getName();
+        
+        listRoom.setListData(temp);
+    }
+    
+    private void refreshMyReservationlist()
+    {
+        freeze();
+        if(!editMan.getText().equals(""))
+            packetbuilder.myRooms(editMan.getText());
+        packetbuilder.myRooms(packetbuilder.getLoginId());
+    }
+    
+    public void updateMyReservationlist(ArrayList<Reservation> list)
+    {
+        String[][] temp = new String[list.size()][2];
+        
+        int i = 0;
+        for(Reservation iter : list)
+        {
+            temp[i][0] = DateTeller.longtoString(iter.getDate());
+            temp[i++][1] = iter.getRoom().getName();
+        }
+        
+        listRoom.setListData(temp);
     }
     
     private void refreshRegList()
@@ -108,14 +152,113 @@ public class MainFrame extends javax.swing.JFrame
         labelUniv_compReg.setText(inf.getUniv_comp());
     }
     
+    public void updateResultTable(ArrayList<Room> list)
+    {
+        String[] columns = {"City", "RoomName", "MaxCap", "Cost"};
+        
+        DefaultTableModel model = new DefaultTableModel(null, columns)
+                                        {
+                                            @Override
+                                            public boolean isCellEditable(int row, int col)
+                                            {
+                                                return false; 
+                                            }
+                                        };
+        for(Room iter : list)
+        {
+            String[] item = new String[4];
+            switch(iter.getCity())
+            {
+            case 0:
+                item[0] = "Seoul";
+                break;
+                
+            case 1:
+                item[0] = "Daejeon";
+                break;
+                
+            case 2:
+                item[0] = "Daegu";
+                break;
+                
+            case 3:
+                item[0] = "Jeonju";
+                break;
+            }
+            item[1] = iter.getName();
+            item[2] = Integer.toString(iter.getMaxcapacity());
+            item[3] = Float.toString(iter.getDefault_rentcost());
+            
+            model.addRow(item);
+        }
+        tableResult.setModel(model);
+    }
+    
+    public void updateCalendar(int year, int month)
+    {
+        String[] strmonth = {   "January", "Febrary", "March", "April", 
+                                "May", "June", "July", "August", 
+                                "September", "October", "Novenber", "December"};
+        
+        labelYear.setText(Integer.toString(year));
+        labelMonth.setText(strmonth[month]);
+        
+        calendar.setYM(year, month);
+        calendar.updateCalendar();
+    }
+    
+    void updateRoomInf(Room inf)
+    {
+        if(inf == null)
+        {
+            editRoomNameRoom.setText("Room Name");
+            comboCityRoom.setSelectedIndex(0);
+            editMaxcapRoom.setText("");
+            editLocationRoom.setText("");
+            labelNameOwner.setText("");
+            labelCompanyOwner.setText("");
+            labelPhoneOwner.setText("");
+            labelEmailOwner.setText("");
+            
+            editDefaultcostRoom.setText("");
+            editRentcostRoom.setText("");
+            //btnProcRoom
+        }
+    }
+    
+    void setRoomInfEnabled(boolean e)
+    {
+        
+    }
+    
+    void updateRsrvInf(float rentcost, boolean reserved, boolean reqcalcel)
+    {
+        editRentcostRoom.setText(Float.toString(rentcost));
+        if(!reserved)
+        {
+            btnProcRoom.setText("Close Reservation");
+            btnProcRoom.setEnabled(true);
+        }
+        else
+        {
+            btnProcRoom.setText("Cancel Reservation");
+            if(reqcalcel) btnProcRoom.setEnabled(true);
+            else btnProcRoom.setEnabled(false);
+        }
+    }
+    
     private MainFrame()
     {
         packetbuilder = PacketBuilder.getInstance();
         initComponents();
         jDateChooser.setLocale(Locale.US);
-        jCalendar.setLocale(Locale.US);
+        calendarBean.setLocale(Locale.US);
         refreshMyAccount();
-        btnProcRsrv.setVisible(false);
+        btnProcRoom.setEnabled(false);
+        calendar = (MyCalendar)calendarBean;
+        
+        Date today = DateTeller.getTodayDate();
+        updateCalendar(today.getYear(), today.getMonth());
     }
 
     @SuppressWarnings("unchecked")
@@ -127,7 +270,7 @@ public class MainFrame extends javax.swing.JFrame
         panelOption = new javax.swing.JPanel();
         jDateChooser = new com.toedter.calendar.JDateChooser();
         comboCity = new javax.swing.JComboBox();
-        EditLocation = new javax.swing.JTextField();
+        editLocation = new javax.swing.JTextField();
         editRoomname = new javax.swing.JTextField();
         chkboxReserved = new javax.swing.JCheckBox();
         editMaxcap = new javax.swing.JFormattedTextField();
@@ -136,23 +279,31 @@ public class MainFrame extends javax.swing.JFrame
         labelRentcost = new javax.swing.JLabel();
         btnSearch = new javax.swing.JButton();
         panelRoomInfo = new javax.swing.JPanel();
-        jPanel4 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
-        jLabel11 = new javax.swing.JLabel();
-        btnProcRsrv = new javax.swing.JButton();
-        jFormattedTextField6 = new javax.swing.JFormattedTextField();
-        jFormattedTextField7 = new javax.swing.JFormattedTextField();
-        jFormattedTextField8 = new javax.swing.JFormattedTextField();
+        editRentcostRoom = new javax.swing.JFormattedTextField();
+        editDefaultcostRoom = new javax.swing.JFormattedTextField();
+        editMaxcapRoom = new javax.swing.JFormattedTextField();
         jLabel7 = new javax.swing.JLabel();
-        comboCity1 = new javax.swing.JComboBox();
+        comboCityRoom = new javax.swing.JComboBox();
         jScrollPane3 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        editLocationRoom = new javax.swing.JTextArea();
+        jSeparator8 = new javax.swing.JSeparator();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        labelNameOwner = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        labelCompanyOwner = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
+        labelPhoneOwner = new javax.swing.JLabel();
+        jLabel16 = new javax.swing.JLabel();
+        labelEmailOwner = new javax.swing.JLabel();
+        btnProcRoom = new javax.swing.JButton();
+        editRoomNameRoom = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
         panelAux = new javax.swing.JTabbedPane();
         tabMyAcc = new javax.swing.JPanel();
         panelMyAcc = new javax.swing.JPanel();
@@ -186,8 +337,8 @@ public class MainFrame extends javax.swing.JFrame
         jPanel8 = new javax.swing.JPanel();
         jSeparator5 = new javax.swing.JSeparator();
         jLabel26 = new javax.swing.JLabel();
-        jScrollPane4 = new javax.swing.JScrollPane();
-        listRsrv = new javax.swing.JList();
+        panelSearchResult1 = new javax.swing.JScrollPane();
+        tableRsrv = new javax.swing.JTable();
         jPanel5 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -207,16 +358,21 @@ public class MainFrame extends javax.swing.JFrame
         btnAcceptReg = new javax.swing.JButton();
         btnRejectReg = new javax.swing.JButton();
         panelSearchResult = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tableResult = new javax.swing.JTable();
         panelCalendar = new javax.swing.JPanel();
-        jCalendar = new com.toedter.calendar.JCalendar();
+        calendarBean = new MyCalendar()
+        ;
+        labelMonth = new javax.swing.JLabel();
+        btnNextMonth = new javax.swing.JButton();
+        btnPrevMonth = new javax.swing.JButton();
+        labelYear = new javax.swing.JLabel();
         progBar = new javax.swing.JProgressBar();
         labelStatus = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
-        jSeparator6 = new javax.swing.JSeparator();
-        editManagingId = new javax.swing.JTextField();
-        jSeparator7 = new javax.swing.JSeparator();
-        jLabel39 = new javax.swing.JLabel();
+        sep2 = new javax.swing.JSeparator();
+        editMan = new javax.swing.JTextField();
+        sep1 = new javax.swing.JSeparator();
+        labelMan = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Room Agent v0.5");
@@ -233,19 +389,19 @@ public class MainFrame extends javax.swing.JFrame
 
         comboCity.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Seoul", "Daejeon", "Daegu", "Jeonju" }));
 
-        EditLocation.setText("Location");
-        EditLocation.addActionListener(new java.awt.event.ActionListener()
+        editLocation.setText("Location");
+        editLocation.addActionListener(new java.awt.event.ActionListener()
         {
             public void actionPerformed(java.awt.event.ActionEvent evt)
             {
-                EditLocationActionPerformed(evt);
+                editLocationActionPerformed(evt);
             }
         });
 
         editRoomname.setText("Room Name");
 
         chkboxReserved.setSelected(true);
-        chkboxReserved.setText("Exclude reserved");
+        chkboxReserved.setText("Exclude Reserved");
         chkboxReserved.addActionListener(new java.awt.event.ActionListener()
         {
             public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -254,13 +410,7 @@ public class MainFrame extends javax.swing.JFrame
             }
         });
 
-        try
-        {
-            editMaxcap.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("####")));
-        } catch (java.text.ParseException ex)
-        {
-            ex.printStackTrace();
-        }
+        editMaxcap.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0"))));
         editMaxcap.addActionListener(new java.awt.event.ActionListener()
         {
             public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -269,13 +419,7 @@ public class MainFrame extends javax.swing.JFrame
             }
         });
 
-        try
-        {
-            editRentcost.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("########")));
-        } catch (java.text.ParseException ex)
-        {
-            ex.printStackTrace();
-        }
+        editRentcost.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("###0.##"))));
 
         labelMaxcap.setText("People or above");
 
@@ -290,7 +434,7 @@ public class MainFrame extends javax.swing.JFrame
                 .addGroup(panelOptionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(editRoomname, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(comboCity, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(EditLocation)
+                    .addComponent(editLocation)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelOptionLayout.createSequentialGroup()
                         .addComponent(editMaxcap)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -313,7 +457,7 @@ public class MainFrame extends javax.swing.JFrame
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(comboCity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(EditLocation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(editLocation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(editRoomname, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -358,23 +502,6 @@ public class MainFrame extends javax.swing.JFrame
         panelRoomInfo.setBackground(new java.awt.Color(255, 255, 255));
         panelRoomInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 240, Short.MAX_VALUE)
-        );
-
-        jLabel1.setFont(new java.awt.Font("굴림", 0, 36)); // NOI18N
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Room Name");
-
-        jLabel3.setText("Location");
-
         jLabel4.setText("People");
 
         jLabel5.setText("Renting Cost");
@@ -385,56 +512,112 @@ public class MainFrame extends javax.swing.JFrame
 
             jLabel10.setText("\\");
 
-                jLabel11.setFont(new java.awt.Font("굴림", 0, 24)); // NOI18N
-                jLabel11.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-                jLabel11.setText("Status");
+                editRentcostRoom.setEditable(false);
+                editRentcostRoom.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("###0.##"))));
 
-                btnProcRsrv.setText("Reserve");
+                editDefaultcostRoom.setEditable(false);
+                editDefaultcostRoom.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("###0.##"))));
 
-                jFormattedTextField6.setEditable(false);
-                try
-                {
-                    jFormattedTextField6.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("########")));
-                } catch (java.text.ParseException ex)
-                {
-                    ex.printStackTrace();
-                }
-
-                jFormattedTextField7.setEditable(false);
-                try
-                {
-                    jFormattedTextField7.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("########")));
-                } catch (java.text.ParseException ex)
-                {
-                    ex.printStackTrace();
-                }
-
-                jFormattedTextField8.setEditable(false);
-                try
-                {
-                    jFormattedTextField8.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("####")));
-                } catch (java.text.ParseException ex)
-                {
-                    ex.printStackTrace();
-                }
-                jFormattedTextField8.addActionListener(new java.awt.event.ActionListener()
+                editMaxcapRoom.setEditable(false);
+                editMaxcapRoom.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(new java.text.DecimalFormat("#0"))));
+                editMaxcapRoom.addActionListener(new java.awt.event.ActionListener()
                 {
                     public void actionPerformed(java.awt.event.ActionEvent evt)
                     {
-                        jFormattedTextField8ActionPerformed(evt);
+                        editMaxcapRoomActionPerformed(evt);
                     }
                 });
 
                 jLabel7.setText("Max");
 
-                comboCity1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Seoul", "Daejeon", "Daegu", "Jeonju" }));
-                comboCity1.setEnabled(false);
+                comboCityRoom.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Seoul", "Daejeon", "Daegu", "Jeonju" }));
+                comboCityRoom.setEnabled(false);
 
-                jTextArea1.setEditable(false);
-                jTextArea1.setColumns(20);
-                jTextArea1.setFont(new java.awt.Font("굴림", 0, 18)); // NOI18N
-                jTextArea1.setRows(3);
-                jScrollPane3.setViewportView(jTextArea1);
+                editLocationRoom.setEditable(false);
+                editLocationRoom.setColumns(20);
+                editLocationRoom.setFont(new java.awt.Font("굴림", 0, 18)); // NOI18N
+                editLocationRoom.setRows(3);
+                jScrollPane3.setViewportView(editLocationRoom);
+
+                jSeparator8.setOrientation(javax.swing.SwingConstants.VERTICAL);
+
+                jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+                jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Owner Infromation"));
+
+                jLabel2.setText("Name");
+
+                labelNameOwner.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+
+                jLabel11.setText("Company");
+
+                labelCompanyOwner.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+
+                jLabel14.setText("Phone");
+
+                labelPhoneOwner.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+
+                jLabel16.setText("Email");
+
+                labelEmailOwner.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+
+                javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+                jPanel1.setLayout(jPanel1Layout);
+                jPanel1Layout.setHorizontalGroup(
+                    jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel11)
+                            .addComponent(jLabel14)
+                            .addComponent(jLabel16))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(labelEmailOwner, javax.swing.GroupLayout.DEFAULT_SIZE, 151, Short.MAX_VALUE)
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(labelPhoneOwner, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(labelCompanyOwner, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(labelNameOwner, javax.swing.GroupLayout.DEFAULT_SIZE, 151, Short.MAX_VALUE)))
+                        .addContainerGap())
+                );
+                jPanel1Layout.setVerticalGroup(
+                    jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel2)
+                            .addComponent(labelNameOwner))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel11)
+                            .addComponent(labelCompanyOwner))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel14)
+                            .addComponent(labelPhoneOwner))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel16)
+                            .addComponent(labelEmailOwner))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                );
+
+                btnProcRoom.setText("Choose a Reservation");
+
+                editRoomNameRoom.setFont(new java.awt.Font("굴림", 0, 24)); // NOI18N
+                editRoomNameRoom.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+                editRoomNameRoom.setText("Room Name");
+                editRoomNameRoom.setToolTipText("");
+                editRoomNameRoom.setEnabled(false);
+                editRoomNameRoom.addActionListener(new java.awt.event.ActionListener()
+                {
+                    public void actionPerformed(java.awt.event.ActionEvent evt)
+                    {
+                        editRoomNameRoomActionPerformed(evt);
+                    }
+                });
+
+                jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ui/sample.png"))); // NOI18N
 
                 javax.swing.GroupLayout panelRoomInfoLayout = new javax.swing.GroupLayout(panelRoomInfo);
                 panelRoomInfo.setLayout(panelRoomInfoLayout);
@@ -442,44 +625,38 @@ public class MainFrame extends javax.swing.JFrame
                     panelRoomInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelRoomInfoLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addGroup(panelRoomInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 320, Short.MAX_VALUE)
-                            .addGroup(panelRoomInfoLayout.createSequentialGroup()
-                                .addComponent(comboCity1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(panelRoomInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(editRoomNameRoom)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelRoomInfoLayout.createSequentialGroup()
+                                .addComponent(comboCityRoom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(jLabel7)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jFormattedTextField8, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(editMaxcapRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel4)))
+                                .addComponent(jLabel4))
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 320, Short.MAX_VALUE)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jSeparator8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(panelRoomInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnProcRoom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(panelRoomInfoLayout.createSequentialGroup()
-                                .addGap(71, 71, 71)
-                                .addGroup(panelRoomInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(btnProcRsrv, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE))
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(panelRoomInfoLayout.createSequentialGroup()
-                                .addGap(203, 203, 203)
-                                .addComponent(jFormattedTextField6, javax.swing.GroupLayout.DEFAULT_SIZE, 103, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel9))
-                            .addGroup(panelRoomInfoLayout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(panelRoomInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jScrollPane3)
+                                    .addComponent(jLabel6)
+                                    .addComponent(jLabel5))
+                                .addGap(37, 37, 37)
+                                .addGroup(panelRoomInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(panelRoomInfoLayout.createSequentialGroup()
-                                        .addGroup(panelRoomInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel5)
-                                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGap(0, 0, Short.MAX_VALUE))
-                                    .addGroup(panelRoomInfoLayout.createSequentialGroup()
-                                        .addComponent(jLabel6)
-                                        .addGap(95, 95, 95)
-                                        .addComponent(jFormattedTextField7, javax.swing.GroupLayout.DEFAULT_SIZE, 103, Short.MAX_VALUE)
+                                        .addComponent(editRentcostRoom)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jLabel10)))))
+                                        .addComponent(jLabel10))
+                                    .addGroup(panelRoomInfoLayout.createSequentialGroup()
+                                        .addComponent(editDefaultcostRoom)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jLabel9)))))
                         .addContainerGap())
                 );
                 panelRoomInfoLayout.setVerticalGroup(
@@ -487,38 +664,38 @@ public class MainFrame extends javax.swing.JFrame
                     .addGroup(panelRoomInfoLayout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(panelRoomInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jSeparator8)
                             .addGroup(panelRoomInfoLayout.createSequentialGroup()
-                                .addGap(6, 6, 6)
-                                .addComponent(jLabel3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(panelRoomInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(panelRoomInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel9)
-                                        .addComponent(jFormattedTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(jLabel5))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(panelRoomInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel6)
-                                    .addGroup(panelRoomInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel10)
-                                        .addComponent(jFormattedTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addGap(18, 18, 18)
-                                .addComponent(jLabel11)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(panelRoomInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(panelRoomInfoLayout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(panelRoomInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel4)
-                                    .addComponent(jFormattedTextField8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel7)
-                                    .addComponent(comboCity1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addComponent(btnProcRsrv, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addGroup(panelRoomInfoLayout.createSequentialGroup()
+                                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addGroup(panelRoomInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel9)
+                                            .addComponent(jLabel6)
+                                            .addComponent(editDefaultcostRoom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(panelRoomInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel10)
+                                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelRoomInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addComponent(editRentcostRoom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(jLabel5)))
+                                        .addGap(6, 6, 6)
+                                        .addComponent(btnProcRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(panelRoomInfoLayout.createSequentialGroup()
+                                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(editRoomNameRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(6, 6, 6)
+                                        .addGroup(panelRoomInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                            .addComponent(comboCityRoom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(jLabel4)
+                                            .addComponent(editMaxcapRoom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(jLabel7))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(9, 9, 9))
                 );
 
                 panelAux.addChangeListener(new javax.swing.event.ChangeListener()
@@ -636,7 +813,7 @@ public class MainFrame extends javax.swing.JFrame
                         .addComponent(editUniv_compAcc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 207, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 172, Short.MAX_VALUE)
                         .addGroup(panelMyAccLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btnSubmitAcc, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(btnCancelAcc, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -656,6 +833,20 @@ public class MainFrame extends javax.swing.JFrame
 
                 panelAux.addTab("My Account", tabMyAcc);
 
+                listRoom.addMouseListener(new java.awt.event.MouseAdapter()
+                {
+                    public void mouseClicked(java.awt.event.MouseEvent evt)
+                    {
+                        listRoomMouseClicked(evt);
+                    }
+                });
+                listRoom.addKeyListener(new java.awt.event.KeyAdapter()
+                {
+                    public void keyPressed(java.awt.event.KeyEvent evt)
+                    {
+                        listRoomKeyPressed(evt);
+                    }
+                });
                 jScrollPane1.setViewportView(listRoom);
 
                 jLabel24.setText("My Room List");
@@ -732,7 +923,7 @@ public class MainFrame extends javax.swing.JFrame
                         .addComponent(btnEditRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(BtnRemoveRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btnSubmitRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(btnCancelRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -743,21 +934,50 @@ public class MainFrame extends javax.swing.JFrame
 
                 jLabel26.setText("My Reservation List");
 
-                listRsrv.addMouseListener(new java.awt.event.MouseAdapter()
+                tableRsrv.setAutoCreateRowSorter(true);
+                tableRsrv.setModel(new javax.swing.table.DefaultTableModel(
+                    new Object [][]
+                    {
+
+                    },
+                    new String []
+                    {
+                        "Date", "Room Name"
+                    }
+                )
+                {
+                    boolean[] canEdit = new boolean []
+                    {
+                        false, false
+                    };
+
+                    public boolean isCellEditable(int rowIndex, int columnIndex)
+                    {
+                        return canEdit [columnIndex];
+                    }
+                });
+                tableRsrv.getTableHeader().setReorderingAllowed(false);
+                tableRsrv.addMouseListener(new java.awt.event.MouseAdapter()
                 {
                     public void mouseClicked(java.awt.event.MouseEvent evt)
                     {
-                        listRsrvMouseClicked(evt);
+                        tableRsrvMouseClicked(evt);
                     }
                 });
-                listRsrv.addKeyListener(new java.awt.event.KeyAdapter()
+                tableRsrv.addKeyListener(new java.awt.event.KeyAdapter()
                 {
                     public void keyPressed(java.awt.event.KeyEvent evt)
                     {
-                        listRsrvKeyPressed(evt);
+                        tableRsrvKeyPressed(evt);
                     }
                 });
-                jScrollPane4.setViewportView(listRsrv);
+                panelSearchResult1.setViewportView(tableRsrv);
+                tableRsrv.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+                if (tableRsrv.getColumnModel().getColumnCount() > 0)
+                {
+                    tableRsrv.getColumnModel().getColumn(0).setResizable(false);
+                    tableRsrv.getColumnModel().getColumn(1).setResizable(false);
+                }
 
                 javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
                 jPanel8.setLayout(jPanel8Layout);
@@ -768,7 +988,7 @@ public class MainFrame extends javax.swing.JFrame
                         .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel26, javax.swing.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)
                             .addComponent(jSeparator5)
-                            .addComponent(jScrollPane4))
+                            .addComponent(panelSearchResult1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                         .addContainerGap())
                 );
                 jPanel8Layout.setVerticalGroup(
@@ -776,11 +996,11 @@ public class MainFrame extends javax.swing.JFrame
                     .addGroup(jPanel8Layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jLabel26)
-                        .addGap(3, 3, 3)
-                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(panelSearchResult1, javax.swing.GroupLayout.PREFERRED_SIZE, 229, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(272, Short.MAX_VALUE))
+                        .addContainerGap(237, Short.MAX_VALUE))
                 );
 
                 javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
@@ -908,7 +1128,7 @@ public class MainFrame extends javax.swing.JFrame
                         .addComponent(jLabel33)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(labelUniv_compReg)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 57, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
                         .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btnAcceptReg, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(btnRejectReg, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -928,7 +1148,8 @@ public class MainFrame extends javax.swing.JFrame
 
                 panelAux.addTab("Registration Request Management", jPanel5);
 
-                jTable1.setModel(new javax.swing.table.DefaultTableModel(
+                tableResult.setAutoCreateRowSorter(true);
+                tableResult.setModel(new javax.swing.table.DefaultTableModel(
                     new Object [][]
                     {
 
@@ -939,59 +1160,130 @@ public class MainFrame extends javax.swing.JFrame
                     }
                 )
                 {
+                    Class[] types = new Class []
+                    {
+                        java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Float.class
+                    };
                     boolean[] canEdit = new boolean []
                     {
                         false, false, false, false
                     };
+
+                    public Class getColumnClass(int columnIndex)
+                    {
+                        return types [columnIndex];
+                    }
 
                     public boolean isCellEditable(int rowIndex, int columnIndex)
                     {
                         return canEdit [columnIndex];
                     }
                 });
-                jTable1.setColumnSelectionAllowed(true);
-                jTable1.getTableHeader().setReorderingAllowed(false);
-                panelSearchResult.setViewportView(jTable1);
-                jTable1.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-                if (jTable1.getColumnModel().getColumnCount() > 0)
+                tableResult.setColumnSelectionAllowed(true);
+                tableResult.getTableHeader().setReorderingAllowed(false);
+                tableResult.addMouseListener(new java.awt.event.MouseAdapter()
                 {
-                    jTable1.getColumnModel().getColumn(0).setResizable(false);
-                    jTable1.getColumnModel().getColumn(1).setResizable(false);
-                    jTable1.getColumnModel().getColumn(2).setResizable(false);
-                    jTable1.getColumnModel().getColumn(3).setResizable(false);
+                    public void mouseClicked(java.awt.event.MouseEvent evt)
+                    {
+                        tableResultMouseClicked(evt);
+                    }
+                });
+                tableResult.addKeyListener(new java.awt.event.KeyAdapter()
+                {
+                    public void keyPressed(java.awt.event.KeyEvent evt)
+                    {
+                        tableResultKeyPressed(evt);
+                    }
+                });
+                panelSearchResult.setViewportView(tableResult);
+                tableResult.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+                if (tableResult.getColumnModel().getColumnCount() > 0)
+                {
+                    tableResult.getColumnModel().getColumn(0).setResizable(false);
+                    tableResult.getColumnModel().getColumn(1).setResizable(false);
+                    tableResult.getColumnModel().getColumn(2).setResizable(false);
+                    tableResult.getColumnModel().getColumn(3).setResizable(false);
                 }
 
-                panelCalendar.setBackground(new java.awt.Color(255, 255, 255));
                 panelCalendar.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+                calendarBean.setFont(new java.awt.Font("굴림", 1, 20)); // NOI18N
+
+                labelMonth.setFont(new java.awt.Font("굴림", 0, 36)); // NOI18N
+                labelMonth.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+                labelMonth.setText("March");
+
+                btnNextMonth.setText("▶");
+                btnNextMonth.addActionListener(new java.awt.event.ActionListener()
+                {
+                    public void actionPerformed(java.awt.event.ActionEvent evt)
+                    {
+                        btnNextMonthActionPerformed(evt);
+                    }
+                });
+
+                btnPrevMonth.setText("◀");
+                btnPrevMonth.setActionCommand("");
+                btnPrevMonth.addActionListener(new java.awt.event.ActionListener()
+                {
+                    public void actionPerformed(java.awt.event.ActionEvent evt)
+                    {
+                        btnPrevMonthActionPerformed(evt);
+                    }
+                });
+
+                labelYear.setFont(new java.awt.Font("굴림", 1, 20)); // NOI18N
+                labelYear.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+                labelYear.setText("2014");
 
                 javax.swing.GroupLayout panelCalendarLayout = new javax.swing.GroupLayout(panelCalendar);
                 panelCalendar.setLayout(panelCalendarLayout);
                 panelCalendarLayout.setHorizontalGroup(
                     panelCalendarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jCalendar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(calendarBean, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelCalendarLayout.createSequentialGroup()
+                        .addGap(3, 3, 3)
+                        .addComponent(btnPrevMonth, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(labelMonth, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(6, 6, 6)
+                        .addComponent(labelYear, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnNextMonth, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(3, 3, 3))
                 );
                 panelCalendarLayout.setVerticalGroup(
                     panelCalendarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jCalendar, javax.swing.GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelCalendarLayout.createSequentialGroup()
+                        .addGap(3, 3, 3)
+                        .addGroup(panelCalendarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(btnPrevMonth, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnNextMonth, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panelCalendarLayout.createSequentialGroup()
+                                .addGroup(panelCalendarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(labelMonth, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(labelYear))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                        .addComponent(calendarBean, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE))
                 );
 
                 labelStatus.setText("Idle State");
 
                 jLabel12.setText("Current version is released at 2014-12-14");
 
-                jSeparator6.setOrientation(javax.swing.SwingConstants.VERTICAL);
+                sep2.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
-                editManagingId.addActionListener(new java.awt.event.ActionListener()
+                editMan.addActionListener(new java.awt.event.ActionListener()
                 {
                     public void actionPerformed(java.awt.event.ActionEvent evt)
                     {
-                        editManagingIdActionPerformed(evt);
+                        editManActionPerformed(evt);
                     }
                 });
 
-                jSeparator7.setOrientation(javax.swing.SwingConstants.VERTICAL);
+                sep1.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
-                jLabel39.setText("Managing Account ID");
+                labelMan.setText("Managing Account ID");
 
                 javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
                 getContentPane().setLayout(layout);
@@ -1011,23 +1303,22 @@ public class MainFrame extends javax.swing.JFrame
                                 .addGap(3, 3, 3)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jSeparator7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(sep1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jLabel39)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(editManagingId, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(labelMan)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 35, Short.MAX_VALUE)
+                                        .addComponent(editMan, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGap(3, 3, 3))
                                     .addComponent(panelCalendar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                         .addGap(3, 3, 3)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jSeparator6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(sep2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(labelStatus)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(progBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(panelAux, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(3, 3, 3))
+                            .addComponent(panelAux, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 );
                 layout.setVerticalGroup(
                     layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1035,13 +1326,13 @@ public class MainFrame extends javax.swing.JFrame
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(panelAux))
+                                .addComponent(panelAux, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(panelSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 373, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addGroup(layout.createSequentialGroup()
                                         .addContainerGap()
-                                        .addComponent(panelRoomInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 358, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                        .addComponent(panelRoomInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                 .addGap(3, 3, 3)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(panelSearchResult, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
@@ -1051,26 +1342,25 @@ public class MainFrame extends javax.swing.JFrame
                                 .addGap(3, 3, 3)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addComponent(progBar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jSeparator6, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jSeparator7, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(sep2, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(sep1, javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(jLabel12)
-                                        .addComponent(editManagingId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jLabel39))))
+                                        .addComponent(editMan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(labelMan))))
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(3, 3, 3)
-                                .addComponent(labelStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(3, 3, 3))
+                                .addComponent(labelStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 );
 
                 pack();
                 setLocationRelativeTo(null);
             }// </editor-fold>//GEN-END:initComponents
 
-    private void EditLocationActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_EditLocationActionPerformed
-    {//GEN-HEADEREND:event_EditLocationActionPerformed
+    private void editLocationActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_editLocationActionPerformed
+    {//GEN-HEADEREND:event_editLocationActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_EditLocationActionPerformed
+    }//GEN-LAST:event_editLocationActionPerformed
 
     private void chkboxReservedActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_chkboxReservedActionPerformed
     {//GEN-HEADEREND:event_chkboxReservedActionPerformed
@@ -1082,10 +1372,10 @@ public class MainFrame extends javax.swing.JFrame
         // TODO add your handling code here:
     }//GEN-LAST:event_editMaxcapActionPerformed
 
-    private void editManagingIdActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_editManagingIdActionPerformed
-    {//GEN-HEADEREND:event_editManagingIdActionPerformed
+    private void editManActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_editManActionPerformed
+    {//GEN-HEADEREND:event_editManActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_editManagingIdActionPerformed
+    }//GEN-LAST:event_editManActionPerformed
 
     private void btnCancelRoomActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnCancelRoomActionPerformed
     {//GEN-HEADEREND:event_btnCancelRoomActionPerformed
@@ -1112,16 +1402,28 @@ public class MainFrame extends javax.swing.JFrame
         // TODO add your handling code here:
     }//GEN-LAST:event_BtnRemoveRoomActionPerformed
 
-    private void jFormattedTextField8ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jFormattedTextField8ActionPerformed
-    {//GEN-HEADEREND:event_jFormattedTextField8ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jFormattedTextField8ActionPerformed
-
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnSearchActionPerformed
     {//GEN-HEADEREND:event_btnSearchActionPerformed
-        //Room temproom = new Room();
-        //Reservation temprsrv = new Reservation();
-        packetbuilder.searchRooms(null);
+        int maxcap = editMaxcap.getText().equals("") ? -1 : Integer.parseInt(editMaxcap.getText());
+        float rentcost = editRentcost.getText().equals("") ? -1.0f : Integer.parseInt(editRentcost.getText());
+        
+        Room temproom = new Room(   null, 
+                                    editRoomname.getText(),
+                                    comboCity.getSelectedIndex(),
+                                    editLocation.getText(),
+                                    maxcap,
+                                    0.0f);
+        
+        Reservation temprsrv = new Reservation( null,
+                                                temproom,
+                                                DateTeller.Datetolong(jDateChooser.getDate()),
+                                                rentcost,
+                                                false,
+                                                !chkboxReserved.isSelected());
+        freeze();
+        calendar.setReservations(null);
+        updateCalendar(jDateChooser.getDate().getYear(), jDateChooser.getDate().getMonth());
+        packetbuilder.searchRooms(temprsrv);
     }//GEN-LAST:event_btnSearchActionPerformed
 
     private void panelAuxStateChanged(javax.swing.event.ChangeEvent evt)//GEN-FIRST:event_panelAuxStateChanged
@@ -1130,6 +1432,12 @@ public class MainFrame extends javax.swing.JFrame
         {
         case 0: // My Account
             refreshMyAccount();
+            break;
+        case 1: // My Room
+            refreshMyRoomlist();
+            break;
+        case 2: // My Reservation
+            refreshMyReservationlist();
             break;
         case 3: // Reg List
             refreshRegList();
@@ -1187,61 +1495,109 @@ public class MainFrame extends javax.swing.JFrame
         packetbuilder.rejectRegistration(reglist.get(listReg.getSelectedIndex()).getId());
     }//GEN-LAST:event_btnRejectRegActionPerformed
 
-    private void listRsrvKeyPressed(java.awt.event.KeyEvent evt)//GEN-FIRST:event_listRsrvKeyPressed
-    {//GEN-HEADEREND:event_listRsrvKeyPressed
-        listRsrvMouseClicked(null);
-    }//GEN-LAST:event_listRsrvKeyPressed
-
-    private void listRsrvMouseClicked(java.awt.event.MouseEvent evt)//GEN-FIRST:event_listRsrvMouseClicked
-    {//GEN-HEADEREND:event_listRsrvMouseClicked
+    private void tableRsrvMouseClicked(java.awt.event.MouseEvent evt)//GEN-FIRST:event_tableRsrvMouseClicked
+    {//GEN-HEADEREND:event_tableRsrvMouseClicked
         freeze();
-        Account inf = new Account(  labelIdAcc.getText(),
-                                    new String(editPwAcc.getPassword()),
-                                    0,
-                                    editNameAcc.getText(),
-                                    editEmailAcc.getText(),
-                                    editPhoneAcc.getText(),
-                                    editUniv_compAcc.getText());
-        packetbuilder.editAccount(inf);        
-    }//GEN-LAST:event_listRsrvMouseClicked
+        int selrow = tableRsrv.getSelectedRow();
+        Date targetdate = DateTeller.StringtoDate((String)tableRsrv.getValueAt(selrow, 0));
+        if(targetdate == null) targetdate = DateTeller.getTodayDate();
+        updateCalendar(targetdate.getYear(), targetdate.getMonth());
+        packetbuilder.queryReservations((String)tableRsrv.getValueAt(selrow, 1));
+    }//GEN-LAST:event_tableRsrvMouseClicked
+
+    private void tableRsrvKeyPressed(java.awt.event.KeyEvent evt)//GEN-FIRST:event_tableRsrvKeyPressed
+    {//GEN-HEADEREND:event_tableRsrvKeyPressed
+        tableRsrvMouseClicked(null);                                         
+    }//GEN-LAST:event_tableRsrvKeyPressed
+
+    private void editMaxcapRoomActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_editMaxcapRoomActionPerformed
+    {//GEN-HEADEREND:event_editMaxcapRoomActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_editMaxcapRoomActionPerformed
+
+    private void btnNextMonthActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnNextMonthActionPerformed
+    {//GEN-HEADEREND:event_btnNextMonthActionPerformed
+        calendar.toNextMonth();
+    }//GEN-LAST:event_btnNextMonthActionPerformed
+
+    private void btnPrevMonthActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnPrevMonthActionPerformed
+    {//GEN-HEADEREND:event_btnPrevMonthActionPerformed
+        calendar.toPrevMonth();
+    }//GEN-LAST:event_btnPrevMonthActionPerformed
+
+    private void tableResultMouseClicked(java.awt.event.MouseEvent evt)//GEN-FIRST:event_tableResultMouseClicked
+    {//GEN-HEADEREND:event_tableResultMouseClicked
+        freeze();
+        int selrow = tableResult.getSelectedRow();
+        packetbuilder.queryReservations((String)tableRsrv.getValueAt(selrow, 1));
+    }//GEN-LAST:event_tableResultMouseClicked
+
+    private void tableResultKeyPressed(java.awt.event.KeyEvent evt)//GEN-FIRST:event_tableResultKeyPressed
+    {//GEN-HEADEREND:event_tableResultKeyPressed
+        tableResultMouseClicked(null);
+    }//GEN-LAST:event_tableResultKeyPressed
+
+    private void listRoomMouseClicked(java.awt.event.MouseEvent evt)//GEN-FIRST:event_listRoomMouseClicked
+    {//GEN-HEADEREND:event_listRoomMouseClicked
+        freeze();
+        Date today = DateTeller.getTodayDate();
+        updateCalendar(today.getYear(), today.getMonth());
+        packetbuilder.queryReservations((String)listRoom.getModel().getElementAt(listRoom.getSelectedIndex()));
+    }//GEN-LAST:event_listRoomMouseClicked
+
+    private void listRoomKeyPressed(java.awt.event.KeyEvent evt)//GEN-FIRST:event_listRoomKeyPressed
+    {//GEN-HEADEREND:event_listRoomKeyPressed
+        listRoomMouseClicked(null);
+    }//GEN-LAST:event_listRoomKeyPressed
+
+    private void editRoomNameRoomActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_editRoomNameRoomActionPerformed
+    {//GEN-HEADEREND:event_editRoomNameRoomActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_editRoomNameRoomActionPerformed
 
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton BtnRemoveRoom;
-    private javax.swing.JTextField EditLocation;
     private javax.swing.JButton btnAcceptReg;
     private javax.swing.JButton btnCancelAcc;
     private javax.swing.JButton btnCancelRoom;
     private javax.swing.JButton btnEditRoom;
     private javax.swing.JButton btnNewRoom;
-    private javax.swing.JButton btnProcRsrv;
+    private javax.swing.JButton btnNextMonth;
+    private javax.swing.JButton btnPrevMonth;
+    private javax.swing.JButton btnProcRoom;
     private javax.swing.JButton btnRejectReg;
     private javax.swing.JButton btnSearch;
     private javax.swing.JButton btnSubmitAcc;
     private javax.swing.JButton btnSubmitRoom;
+    private com.toedter.calendar.JDayChooser calendarBean;
     private javax.swing.JCheckBox chkboxReserved;
     private javax.swing.JComboBox comboCity;
-    private javax.swing.JComboBox comboCity1;
+    private javax.swing.JComboBox comboCityRoom;
+    private javax.swing.JFormattedTextField editDefaultcostRoom;
     private javax.swing.JTextField editEmailAcc;
-    private javax.swing.JTextField editManagingId;
+    private javax.swing.JTextField editLocation;
+    private javax.swing.JTextArea editLocationRoom;
+    private javax.swing.JTextField editMan;
     private javax.swing.JFormattedTextField editMaxcap;
+    private javax.swing.JFormattedTextField editMaxcapRoom;
     private javax.swing.JTextField editNameAcc;
     private javax.swing.JFormattedTextField editPhoneAcc;
     private javax.swing.JPasswordField editPwAcc;
     private javax.swing.JFormattedTextField editRentcost;
+    private javax.swing.JFormattedTextField editRentcostRoom;
+    private javax.swing.JTextField editRoomNameRoom;
     private javax.swing.JTextField editRoomname;
     private javax.swing.JTextField editUniv_compAcc;
-    private com.toedter.calendar.JCalendar jCalendar;
     private com.toedter.calendar.JDateChooser jDateChooser;
-    private javax.swing.JFormattedTextField jFormattedTextField6;
-    private javax.swing.JFormattedTextField jFormattedTextField7;
-    private javax.swing.JFormattedTextField jFormattedTextField8;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
@@ -1255,43 +1611,44 @@ public class MainFrame extends javax.swing.JFrame
     private javax.swing.JLabel jLabel31;
     private javax.swing.JLabel jLabel32;
     private javax.swing.JLabel jLabel33;
-    private javax.swing.JLabel jLabel39;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSeparator jSeparator5;
-    private javax.swing.JSeparator jSeparator6;
-    private javax.swing.JSeparator jSeparator7;
-    private javax.swing.JTable jTable1;
-    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JSeparator jSeparator8;
+    private javax.swing.JLabel labelCompanyOwner;
+    private javax.swing.JLabel labelEmailOwner;
     private javax.swing.JLabel labelEmailReg;
     private javax.swing.JLabel labelIdAcc;
     private javax.swing.JLabel labelIdReg;
+    private javax.swing.JLabel labelMan;
     private javax.swing.JLabel labelMaxcap;
+    private javax.swing.JLabel labelMonth;
+    private javax.swing.JLabel labelNameOwner;
     private javax.swing.JLabel labelNameReg;
+    private javax.swing.JLabel labelPhoneOwner;
     private javax.swing.JLabel labelPhoneReg;
     private javax.swing.JLabel labelRentcost;
     private javax.swing.JLabel labelStatus;
     private javax.swing.JLabel labelUniv_compReg;
+    private javax.swing.JLabel labelYear;
     private javax.swing.JList listReg;
     private javax.swing.JList listRoom;
-    private javax.swing.JList listRsrv;
     private javax.swing.JTabbedPane panelAux;
     private javax.swing.JPanel panelCalendar;
     private javax.swing.JPanel panelMyAcc;
@@ -1299,7 +1656,97 @@ public class MainFrame extends javax.swing.JFrame
     private javax.swing.JPanel panelRoomInfo;
     private javax.swing.JPanel panelSearch;
     private javax.swing.JScrollPane panelSearchResult;
+    private javax.swing.JScrollPane panelSearchResult1;
     private javax.swing.JProgressBar progBar;
+    private javax.swing.JSeparator sep1;
+    private javax.swing.JSeparator sep2;
     private javax.swing.JPanel tabMyAcc;
+    private javax.swing.JTable tableResult;
+    private javax.swing.JTable tableRsrv;
     // End of variables declaration//GEN-END:variables
+}
+
+
+class MyCalendar extends com.toedter.calendar.JDayChooser
+{
+    ArrayList<Reservation> list;
+    
+    private int firstbtnindex;
+    private int year;
+    private int month;
+        
+    public void updateCalendar()
+    {
+        clearDayColors();
+        
+        if(list == null) return;
+            
+        for(Reservation iter : list)
+        {
+            if(DateTeller.longtoDate(iter.getDate()).getYear() != year) continue;
+            if(DateTeller.longtoDate(iter.getDate()).getMonth() != month) continue;
+            if(iter.isReqcancel())
+                setDayColor(DateTeller.longtoDate(iter.getDate()).getDay(), Color.YELLOW);
+            else if(iter.isReserved())
+                setDayColor(DateTeller.longtoDate(iter.getDate()).getDay(), Color.BLUE);
+            else setDayColor(DateTeller.longtoDate(iter.getDate()).getDay(), Color.GREEN);
+        }
+    }
+    
+    void setYM(int year, int month)
+    {
+        if(year != -1) this.year = year;
+        if(month != -1) this.month = month;
+        setYear(year);
+        setMonth(year);
+    }
+    
+    public void toNextMonth()
+    {
+        if(month++ > 11)
+        {
+            year++;
+            month = 0;
+        }
+        MainFrame.getInstance().updateCalendar(year, month);
+    }
+    
+    public void toPrevMonth()
+    {
+        if(month-- < 0)
+        {
+            year--;
+            month = 11;
+        }
+        MainFrame.getInstance().updateCalendar(year, month);
+    }
+    
+    public ArrayList<Reservation> getReservations()
+    {
+        return list;
+    }
+    
+    public void setReservations(ArrayList<Reservation> list)
+    {
+        this.list = list;
+    }
+    
+    
+    private void setDayColor(int i, Color c)
+    {
+        days[firstbtnindex+i-1].setForeground(c);
+    }
+
+    private void clearDayColors()
+    {
+        for(int i=7 ; i<days.length ; i++)
+            days[i].setForeground(Color.BLACK);
+        
+        for(int i=7 ; i<days.length ; i++)
+            if(days[i].isVisible())
+            {
+                firstbtnindex = i;
+                break;
+            }
+    }
 }

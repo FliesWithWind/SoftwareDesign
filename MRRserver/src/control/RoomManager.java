@@ -117,6 +117,12 @@ public class RoomManager
 		targetlist = searchByCity			(targetlist, reservationinf.getRoom().getCity());
 		targetlist = searchByAvailability	(targetlist, reservationinf.getClient() == null);
 		
+		targetlist = (ArrayList<Room>) targetlist.clone();
+		for(Room iter : targetlist)
+		{
+			iter.setOwner(null);
+			iter.setReservations(null);
+		}
 		return targetlist;
 	}
 
@@ -135,11 +141,19 @@ public class RoomManager
 		targetlist = searchByRentcost		(targetlist, reservationinf.getRentcost());
 		targetlist = searchByCity			(targetlist, reservationinf.getRoom().getCity());
 		targetlist = searchByAvailability	(targetlist, reservationinf.getClient() == null);
+		
+		targetlist = (ArrayList<Room>) targetlist.clone();
+		for(Room iter : targetlist)
+		{
+			iter.setOwner(null);
+			iter.setReservations(null);
+		}
+		
 		templist   = searchByLocation		(targetlist, reservationinf.getRoom().getLocation());
 
 		// if there's no result that searched by location,
 		// returns list not searched by location
-		if(templist == null)	return targetlist;
+		if(templist.isEmpty())	return targetlist;
 		else					return templist;
 	}
 	
@@ -246,7 +260,7 @@ public class RoomManager
 
 	private ArrayList<Room> searchByRentcost(ArrayList<Room> targetlist, float rentcost)
 	{
-		if(rentcost == -1) return targetlist;
+		if(rentcost < 0.0f) return targetlist;
 		
 		ArrayList<Room> result = new ArrayList<Room>();
 

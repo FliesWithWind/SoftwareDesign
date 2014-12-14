@@ -27,15 +27,17 @@ public class STR
     NOTI_DUP_REGLIST        = "There is the same ID requested for registration.",
     
 	NOTI_NO_RESULT			= "There is no result for the query.",
+    NOTI_SEC_RESULT         = "There is no result for the query.\nReceived alternative suggestions.",
     
     NOTI_NOT_REGISTERED_ACC = "The account is not registered.",
             
     NOTI_NOT_SELECTED       = "Please select an item.",
             
-	/***************************************************************************/
-	
     LABEL_STATE_IDLE        = "Idle State",
     LABEL_STATE_BUSY        = "Processing...",
+            
+	/***************************************************************************/
+	
 	
 			
 	NOTI_TITLE_INVALID_ACCESS		= "Invalid Access",

@@ -3,7 +3,6 @@ package control;
 import java.util.ArrayList;
 
 import datatype.*;
-import javax.swing.WindowConstants;
 import network.Packet;
 import ui.*;
 
@@ -51,9 +50,10 @@ public class PacketProcessor
 				break;
 
 			case Packet.MY_ROOMS:
-				if(((ArrayList<Room>) packet.getData()).size() == 0); // remove semicolon when implementing
-					// mainframe.dialogue(1, STR.NOTI_TITLE_NO_RESULT, STR.NOTI_CONTENT_NO_RESULT);
-				// else mainframe.updateMyRooms((ArrayList<Room>) packet.getData());
+                MainFrame.getInstance().updateMyRoomlist((ArrayList<Room>)packet.getData());
+                MainFrame.getInstance().unfreeze();
+				if(((ArrayList<Room>) packet.getData()).isEmpty())
+                        MainFrame.getInstance().showDialog(STR.NOTI_NO_RESULT);
 				break;
 
 			case Packet.CREATE_ROOM:
@@ -72,9 +72,10 @@ public class PacketProcessor
 				break;
 
 			case Packet.MY_RSRVS:
-				if(((ArrayList<Room>) packet.getData()).size() == 0); // remove semicolon when implementing
-					// mainframe.dialogue(1, STR.NOTI_TITLE_NO_RESULT, STR.NOTI_CONTENT_NO_RESULT);
-				// else mainframe.updateMyReservations((ArrayList<Room>) packet.getData());
+                MainFrame.getInstance().updateMyReservationlist((ArrayList<Reservation>)packet.getData());
+                MainFrame.getInstance().unfreeze();
+				if(((ArrayList<Reservation>) packet.getData()).isEmpty())
+                        MainFrame.getInstance().showDialog(STR.NOTI_NO_RESULT);
 				break;
 
 			case Packet.RESERVE:
@@ -105,7 +106,7 @@ public class PacketProcessor
 				break;
 
 			case Packet.QUERY_RSRVS:
-				if(((ArrayList<Reservation>) packet.getData()).size() == 0); // remove semicolon when implementing
+				if(((ArrayList<Reservation>) packet.getData()).isEmpty()); // remove semicolon when implementing
 					// mainframe.dialogue(1, STR.NOTI_TITLE_NO_RESERVATION, STR.NOTI_CONTENT_NO_RESERVATION);
 				// mainframe.updateCalendar((ArrayList<Room>) packet.getData()[1]);
 				break;
@@ -114,7 +115,7 @@ public class PacketProcessor
                 MainFrame.getInstance().updateRegList((ArrayList<Account>) packet.getData());
                 MainFrame.getInstance().updateRegSection(null);
                 MainFrame.getInstance().unfreeze();
-				if(((ArrayList<Account>) packet.getData()).size() == 0)
+				if(((ArrayList<Account>) packet.getData()).isEmpty())
                     MainFrame.getInstance().showDialog(STR.NOTI_NO_RESULT);
 				break;
 
@@ -130,10 +131,6 @@ public class PacketProcessor
 		if(packet.getFlag() == Packet._REJECTED)
 			switch(context)
 			{
-			case Packet.MY_ACNT:
-				// mainframe.updateAccountSection((Account) packet.getData());
-				break;
-
 			case Packet.REGISTER:
                 RegisterFrame.getInstance().setEnabled(true);
                 if((int)packet.getData() == 1) msg = STR.NOTI_DUP_ACCLIST;
@@ -149,12 +146,6 @@ public class PacketProcessor
                 MainFrame.getInstance().showDialog(msg);
 				break;
 
-			case Packet.MY_ROOMS:
-				if(((ArrayList<Room>) packet.getData()).size() == 0); // remove semicolon when implementing
-					// mainframe.dialogue(1, STR.NOTI_TITLE_NO_RESULT, STR.NOTI_CONTENT_NO_RESULT);
-				// else mainframe.updateMyRooms((ArrayList<Room>) packet.getData());
-				break;
-
 			case Packet.CREATE_ROOM:
 				// else mainframe.updateMyRooms((ArrayList<Room>) packet.getData());
 				// mainframe.dialogue(0, STR.NOTI_TITLE_CREATE_ROOM, STR.NOTI_CONTENT_CREATE_ROOM);
@@ -168,12 +159,6 @@ public class PacketProcessor
 			case Packet.REMOVE_ROOM:
 				// else mainframe.updateMyRooms((ArrayList<Room>) packet.getData());
 				// mainframe.dialogue(0, STR.NOTI_TITLE_ACCEPTED, STR.NOTI_CONTENT_ACCEPTED);
-				break;
-
-			case Packet.MY_RSRVS:
-				if(((ArrayList<Room>) packet.getData()).size() == 0); // remove semicolon when implementing
-					// mainframe.dialogue(1, STR.NOTI_TITLE_NO_RESULT, STR.NOTI_CONTENT_NO_RESULT);
-				// else mainframe.updateMyReservations((ArrayList<Room>) packet.getData());
 				break;
 
 			case Packet.RESERVE:
@@ -204,7 +189,7 @@ public class PacketProcessor
 				break;
 
 			case Packet.QUERY_RSRVS:
-				if(((ArrayList<Reservation>) packet.getData()).size() == 0); // remove semicolon when implementing
+				if(((ArrayList<Reservation>) packet.getData()).isEmpty()); // remove semicolon when implementing
 					// mainframe.dialogue(1, STR.NOTI_TITLE_NO_RESERVATION, STR.NOTI_CONTENT_NO_RESERVATION);
 				// mainframe.updateCalendar((ArrayList<Room>) packet.getData()[1]);
 				break;
@@ -239,13 +224,16 @@ public class PacketProcessor
 			break;
 
 		case Packet._SEARCH_PRI:
-			// mainframe.updateRoomTable((ArrayList<Room>) packet.getData());
+			MainFrame.getInstance().updateResultTable((ArrayList<Room>) packet.getData());
+            MainFrame.getInstance().unfreeze();
 			break;
 
 		case Packet._SEARCH_SEC:
-			if(((ArrayList<Room>) packet.getData()).size() == 0); // remove semicolon when implementing
-				// mainframe.dialogue(1, STR.NOTI_TITLE_NO_RESULT, STR.NOTI_CONTENT_NO_RESULT);
-			// else mainframe.updateRoomTable((ArrayList<Room>) packet.getData());
+			MainFrame.getInstance().updateResultTable((ArrayList<Room>) packet.getData());
+            MainFrame.getInstance().unfreeze();
+			if(((ArrayList<Room>) packet.getData()).isEmpty())
+                MainFrame.getInstance().showDialog(STR.NOTI_NO_RESULT);
+            else MainFrame.getInstance().showDialog(STR.NOTI_SEC_RESULT);
 			break;
 			
 		case Packet._ACCEPTED:

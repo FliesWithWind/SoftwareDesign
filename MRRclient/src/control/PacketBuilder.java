@@ -270,13 +270,11 @@ public class PacketBuilder
 	}
 
 	// Query reservations on a certain room
-	public void queryReservations(String name, long date)
+	public void queryReservations(String name)
 	{
-		String[] inf = {name, Long.toString(date)}; // date to be parsed in server
-		
 		try
 		{
-			network.send(new Packet(Packet.QUERY_RSRVS, this.id, this.pw, inf));
+			network.send(new Packet(Packet.QUERY_RSRVS, this.id, this.pw, name));
 		}
 		catch(IOException e)
 		{handleConnectionError(Packet.QUERY_RSRVS);}

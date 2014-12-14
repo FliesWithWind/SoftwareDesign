@@ -20,9 +20,9 @@ public class Processor
 
 	public static final String CURRENT_VERSION = "0.5";
 	
-	private AccountManager		accountmanager;
-	private RoomManager			roommanager;
-	private ReservationManager	reservationmanager;
+	private static AccountManager		accountmanager;
+	private static RoomManager			roommanager;
+	private static ReservationManager	reservationmanager;
 		
 	public Processor()
 	{
@@ -54,14 +54,25 @@ public class Processor
 		for(Account iter : acclist) // fill up roomlist and rsrvlist
 		{
 			for(Room e : iter.getMyrooms()) roomlist.add(e);
-			for(Reservation e : iter.getMyreservations()) rsrvlist.add(e);
 		}
 		
 		accountmanager		= new AccountManager(acclist, reglist);
 		roommanager			= new RoomManager(roomlist);
-		reservationmanager	= new ReservationManager(rsrvlist);
+		reservationmanager	= new ReservationManager();
 	}
 	
+	public static void saveData()
+	{
+		try
+		{
+			FileIO.saveData(accountmanager.getAccountList());
+			FileIO.saveRegisters(accountmanager.getRegisterList());
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
 
 	/*** Client sends Account object, and server converts it to String form ***/
 	public Packet process(Packet packet) throws Exception
@@ -259,24 +270,29 @@ public class Processor
 			
 		case Packet.SEARCH_ROOMS:
 			temprooml = roommanager.primarySearch((Reservation)packet.getData());
-			if(temprooml != null) return new Packet(Packet._SEARCH_PRI, null, null, temprooml);
+			if(!temprooml.isEmpty()) return new Packet(Packet._SEARCH_PRI, null, null, temprooml);
 			temprooml = roommanager.secondarySearch((Reservation)packet.getData());
 			return new Packet(Packet._SEARCH_SEC, null, null, temprooml);
 			
 		case Packet.QUERY_RSRVS:
-			temproom = roommanager.searchRoom(((String[])packet.getData())[0]);
-			tempdate = Long.parseLong(((String[])packet.getData())[1]);
+			temproom = roommanager.searchRoom((String)packet.getData());
 			temprsrvl = new ArrayList<Reservation>();
 			for(Reservation iter : temproom.getReservations())
-				if(iter.getDate() >= tempdate - 31 && iter.getDate() <= tempdate + 31)
-				{
-					Reservation element = (Reservation) iter.clone();
-					element.setClient(null);
-					element.getRoom().setOwner(null);
-					element.getRoom().setReservations(null);
-					temprsrvl.add(element);
-				}
-			return new Packet(Packet._ACCEPTED, null, null, temprsrvl);	
+			{
+				Reservation element = (Reservation) iter.clone();
+				element.setClient(null);
+				element.getRoom().setOwner(null);
+				element.getRoom().setReservations(null);
+				temprsrvl.add(element);
+			}
+			temproom = (Room) temproom.clone();
+			temproom.setReservations(temprsrvl);
+			temproom.getOwner().setId("");
+			temproom.getOwner().setPw("");
+			temproom.getOwner().setMyreservations(null);
+			temproom.getOwner().setMyrooms(null);
+			
+			return new Packet(Packet._ACCEPTED, null, null, temproom);	
 		}
 		
 		/*** Requests those requires staff authority ***/
