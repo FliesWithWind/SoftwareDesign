@@ -10,7 +10,8 @@ public class STR
 
     CONFIRM_TITLE           = "Are you sure?",
     CONFIRM_CONTENT         = "Are you sure with the request to submit?",
-    
+    INPUT_RENTCOST          = "Please input rentcost",
+            
 	/***************************************************************************/
     
 	NOTI_ACCEPTED           = "The request was submitted successfully.",
@@ -25,48 +26,37 @@ public class STR
     
     NOTI_DUP_ACCLIST        = "There is the same ID already registered.",
     NOTI_DUP_REGLIST        = "There is the same ID requested for registration.",
-    
+    NOTI_DUP_ROOMNAME       = "There is the same Room Name already registered.",
+    NOTI_DUP_RSRV           = "There is a Reservation already registered in the date.",
+            
 	NOTI_NO_RESULT			= "There is no result for the query.",
     NOTI_SEC_RESULT         = "There is no result for the query.\nReceived alternative suggestions.",
     
-    NOTI_NOT_REGISTERED_ACC = "The account is not registered.",
+    NOTI_NOT_REGISTERED_ACC = "Cannot find the account.",
+    NOTI_NOT_REGISTERED_ROOM= "Cannot find the room.",
+    NOTI_NOT_REGISTERED_RSRV= "Cannot find the reservation.",
             
+    NOTI_RESERVED_ROOM      = "The room had been reserved.",
+    NOTI_RESERVED_RSRV      = "The room had been reserved by an other.",
+            
+    NOTI_PASSED_DATE_ROOM   = "Can not open room to be lent at passed date.",
+    NOTI_PASSED_DATE_RSRV   = "Can not reserve room at passed date.",
+    NOTI_PASSED_DATE_REQCANCEL = "Can not request for cancel reservation at passed date.",
+    NOTI_PASSED_DATE_CLOSE = "Can not close reservation at passed date.",
+    NOTI_PASSED_DATE_CANCEL = "Can not cancel reservation at passed date.",
+    
     NOTI_NOT_SELECTED       = "Please select an item.",
+    NOTI_INPUT_POSITIVE     = "Please input positive value.",
             
     LABEL_STATE_IDLE        = "Idle State",
     LABEL_STATE_BUSY        = "Processing...",
             
-	/***************************************************************************/
-	
-	
-			
-	NOTI_TITLE_INVALID_ACCESS		= "Invalid Access",
-	NOTI_CONTENT_INVALID_ACCESS		= "You are not authorized for the request.",
-			
-	NOTI_TITLE_REJECTED				= "Rejected",
-	
-	NOTI_TITLE_UNKNOWN				= "Unknown Massage",
-	NOTI_CONTENT_UNKNOWN			= "Server received unknown message.",
-			
-	NOTI_TITLE_OUTDATED_VERSION		= "Outdated version",
-	NOTI_CONTENT_OUTDATED_VERSION	= "Please update application." + 
-									  "The newest version is ",
-										
-	NOTI_TITLE_CREATE_ROOM			= "Room Created",
-	NOTI_CONTENT_CREATE_ROOM		= "The new room was created successfully.",
-	
-	NOTI_TITLE_RESERVE				= "Reserved",
-	NOTI_CONTENT_RESERVE			= "The room was reserved successfully.",
-	
-	NOTI_TITLE_REQ_CANCEL_RSRV		= "Submitted",
-	NOTI_CONTENT_REQ_CANCEL_RSRV	= "The cancel request was submitted successfully.",
-			
-	NOTI_TITLE_ACCEPT_REG			= "Accepted",
-	NOTI_CONTENT_ACCEPT_REG			= "The accepting request was submitted successfully.",
-					
-	NOTI_TITLE_REJECT_REG			= "Accepted",
-	NOTI_CONTENT_REJECT_REG			= "The rejecting request was submitted successfully.",
-			
-	NOTI_TITLE_NO_RESERVATION		= "No Record",
-	NOTI_CONTENT_NO_RESERVATION		= "There is no record on the room.";
+	NOTI_INVALID_ACCESS		= "You are not authorized for the request.",
+            
+	NOTI_OUTDATED_VERSION	= "Please update application.\n" + 
+							  "The newest version is ",
+            
+	NOTI_UNKNOWN			= "Server received unknown message.",
+    
+    NOTI_FILL_THE_FORM      = "Please fill the all forms.";
 }

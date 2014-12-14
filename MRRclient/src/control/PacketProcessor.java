@@ -57,18 +57,18 @@ public class PacketProcessor
 				break;
 
 			case Packet.CREATE_ROOM:
-				// else mainframe.updateMyRooms((ArrayList<Room>) packet.getData());
-				// mainframe.dialogue(0, STR.NOTI_TITLE_CREATE_ROOM, STR.NOTI_CONTENT_CREATE_ROOM);
-				break;
-				
 			case Packet.EDIT_ROOM:
-				// else mainframe.updateMyRooms((ArrayList<Room>) packet.getData());
-				// mainframe.dialogue(0, STR.NOTI_TITLE_EDIT_ROOM, STR.NOTI_CONTENT_EDIT_ROOM);
-				return;
+                MainFrame.getInstance().updateMyRoomlist((ArrayList<Room>)packet.getData());
+                RoomFrame.getInstance().dispose();
+				break;
 
 			case Packet.REMOVE_ROOM:
-				// else mainframe.updateMyRooms((ArrayList<Room>) packet.getData());
-				// mainframe.dialogue(0, STR.NOTI_TITLE_ACCEPTED, STR.NOTI_CONTENT_ACCEPTED);
+                MainFrame.getInstance().updateRoomInf(null);
+                MainFrame.getInstance().updateRsrvInf(-1, true, true);
+                MainFrame.getInstance().getCalendar().setReservations(null);
+                MainFrame.getInstance().updateCalendar(-1, -1);
+                MainFrame.getInstance().updateMyRoomlist((ArrayList<Room>)packet.getData());
+                MainFrame.getInstance().unfreeze();
 				break;
 
 			case Packet.MY_RSRVS:
@@ -79,36 +79,25 @@ public class PacketProcessor
 				break;
 
 			case Packet.RESERVE:
-				// mainframe.updateMyReservations((ArrayList<Reservation>) packet.getData()[0]);
-				// mainframe.updateCalendar((ArrayList<Reservation>) packet.getData()[1]);
-				// mainframe.dialogue(0, STR.NOTI_TITLE_RESERVE, STR.NOTI_CONTENT_RESERVE);
+			case Packet.REQ_CANCEL_RSRV:
+			case Packet.OPEN_RSRV:
+			case Packet.CLOSE_RSRV:
+			case Packet.CANCEL_RSRV:
+                ArrayList<Reservation> templist = ((Room)packet.getData()).getReservations();
+                MainFrame.getInstance().updateRoomInf((Room)packet.getData());
+                MainFrame.getInstance().getCalendar().setReservations(templist);
+                MainFrame.getInstance().updateCalendar(-1, -1);
+                MainFrame.getInstance().unfreeze();
+				MainFrame.getInstance().showDialog(STR.NOTI_ACCEPTED);
 				return;
 
-			case Packet.REQ_CANCEL_RSRV:
-				// mainframe.updateMyReservations((ArrayList<Room>) packet.getData()[0]);
-				// mainframe.updateCalendar((ArrayList<Room>) packet.getData()[1]);
-				// mainframe.dialogue(0, STR.NOTI_TITLE_REQ_CANCEL_RSRV, STR.NOTI_REQ_CANCEL_RSRV);
-				break;
-
-			case Packet.OPEN_RSRV:
-				// mainframe.updateCalendar((ArrayList<Room>) packet.getData());
-				// mainframe.dialogue(0, STR.NOTI_TITLE_ACCEPTED, STR.NOTI_CONTENT_ACCEPTED);
-				break;
-				
-			case Packet.CLOSE_RSRV:
-				// mainframe.updateCalendar((ArrayList<Room>) packet.getData());
-				// mainframe.dialogue(0, STR.NOTI_TITLE_ACCEPTED, STR.NOTI_CONTENT_ACCEPTED);
-				break;
-
-			case Packet.CANCEL_RSRV:
-				// mainframe.updateCalendar((ArrayList<Room>) packet.getData());
-				// mainframe.dialogue(0, STR.NOTI_TITLE_ACCEPTED, STR.NOTI_CONTENT_ACCEPTED);
-				break;
 
 			case Packet.QUERY_RSRVS:
-				if(((ArrayList<Reservation>) packet.getData()).isEmpty()); // remove semicolon when implementing
-					// mainframe.dialogue(1, STR.NOTI_TITLE_NO_RESERVATION, STR.NOTI_CONTENT_NO_RESERVATION);
-				// mainframe.updateCalendar((ArrayList<Room>) packet.getData()[1]);
+                ArrayList<Reservation> temprsrv = ((Room)packet.getData()).getReservations();
+                MainFrame.getInstance().updateRoomInf((Room)packet.getData());
+                MainFrame.getInstance().getCalendar().setReservations(temprsrv);
+                MainFrame.getInstance().updateCalendar(-1, -1);
+                MainFrame.getInstance().unfreeze();
 				break;
 
 			case Packet.QUERY_REGS:
@@ -142,56 +131,68 @@ public class PacketProcessor
 			case Packet.EDIT_ACNT:
                 MainFrame.getInstance().unfreeze();
                 if((int)packet.getData() == 1) msg = STR.NOTI_INVALID_FORM;
-                else if((int)packet.getData() == 1) msg = STR.NOTI_NOT_REGISTERED_ACC;
+                else if((int)packet.getData() == 2) msg = STR.NOTI_NOT_REGISTERED_ACC;
                 MainFrame.getInstance().showDialog(msg);
 				break;
 
 			case Packet.CREATE_ROOM:
-				// else mainframe.updateMyRooms((ArrayList<Room>) packet.getData());
-				// mainframe.dialogue(0, STR.NOTI_TITLE_CREATE_ROOM, STR.NOTI_CONTENT_CREATE_ROOM);
+                RoomFrame.getInstance().setEnabled(true);
+                if((int)packet.getData() == 1) msg = STR.NOTI_DUP_ROOMNAME;
+                else if((int)packet.getData() == 2) msg = STR.NOTI_INVALID_FORM;
+                RoomFrame.getInstance().showDialog(msg);
 				break;
 				
 			case Packet.EDIT_ROOM:
-				// else mainframe.updateMyRooms((ArrayList<Room>) packet.getData());
-				// mainframe.dialogue(0, STR.NOTI_TITLE_EDIT_ROOM, STR.NOTI_CONTENT_EDIT_ROOM);
+                RoomFrame.getInstance().setEnabled(true);
+                if((int)packet.getData() == 1) msg = STR.NOTI_NOT_REGISTERED_ROOM;
+                else if((int)packet.getData() == 2) msg = STR.NOTI_INVALID_FORM;
+                RoomFrame.getInstance().showDialog(msg);
 				return;
 
 			case Packet.REMOVE_ROOM:
-				// else mainframe.updateMyRooms((ArrayList<Room>) packet.getData());
-				// mainframe.dialogue(0, STR.NOTI_TITLE_ACCEPTED, STR.NOTI_CONTENT_ACCEPTED);
+                MainFrame.getInstance().unfreeze();
+                if((int)packet.getData() == 1) msg = STR.NOTI_NOT_REGISTERED_ROOM;
+                else if((int)packet.getData() == 2) msg = STR.NOTI_RESERVED_ROOM;
+                MainFrame.getInstance().showDialog(msg);
 				break;
 
 			case Packet.RESERVE:
-				// mainframe.updateMyReservations((ArrayList<Reservation>) packet.getData()[0]);
-				// mainframe.updateCalendar((ArrayList<Reservation>) packet.getData()[1]);
-				// mainframe.dialogue(0, STR.NOTI_TITLE_RESERVE, STR.NOTI_CONTENT_RESERVE);
+                MainFrame.getInstance().unfreeze();
+                if((int)packet.getData() == 1) msg = STR.NOTI_DUP_RSRV;
+                else if((int)packet.getData() == 2) msg = STR.NOTI_PASSED_DATE_RSRV;
+                else if((int)packet.getData() == 3) msg = STR.NOTI_RESERVED_RSRV;
+                MainFrame.getInstance().showDialog(msg);
 				return;
 
 			case Packet.REQ_CANCEL_RSRV:
-				// mainframe.updateMyReservations((ArrayList<Room>) packet.getData()[0]);
-				// mainframe.updateCalendar((ArrayList<Room>) packet.getData()[1]);
-				// mainframe.dialogue(0, STR.NOTI_TITLE_REQ_CANCEL_RSRV, STR.NOTI_REQ_CANCEL_RSRV);
+                MainFrame.getInstance().unfreeze();
+                if((int)packet.getData() == 1) msg = STR.NOTI_NOT_REGISTERED_RSRV;
+                else if((int)packet.getData() == 2) msg = STR.NOTI_PASSED_DATE_REQCANCEL;
+                MainFrame.getInstance().showDialog(msg);
 				break;
 
 			case Packet.OPEN_RSRV:
-				// mainframe.updateCalendar((ArrayList<Room>) packet.getData());
-				// mainframe.dialogue(0, STR.NOTI_TITLE_ACCEPTED, STR.NOTI_CONTENT_ACCEPTED);
+                MainFrame.getInstance().unfreeze();
+                if((int)packet.getData() == 1) msg = STR.NOTI_DUP_RSRV;
+                else if((int)packet.getData() == 2) msg = STR.NOTI_PASSED_DATE_ROOM;
+                else if((int)packet.getData() == 3) msg = STR.NOTI_INVALID_FORM;
+                MainFrame.getInstance().showDialog(msg);
 				break;
 				
 			case Packet.CLOSE_RSRV:
-				// mainframe.updateCalendar((ArrayList<Room>) packet.getData());
-				// mainframe.dialogue(0, STR.NOTI_TITLE_ACCEPTED, STR.NOTI_CONTENT_ACCEPTED);
+                MainFrame.getInstance().unfreeze();
+                if((int)packet.getData() == 1) msg = STR.NOTI_NOT_REGISTERED_ROOM;
+                else if((int)packet.getData() == 2) msg = STR.NOTI_PASSED_DATE_CLOSE;
+                else if((int)packet.getData() == 3) msg = STR.NOTI_INVALID_FORM;
+                MainFrame.getInstance().showDialog(msg);
 				break;
 
 			case Packet.CANCEL_RSRV:
-				// mainframe.updateCalendar((ArrayList<Room>) packet.getData());
-				// mainframe.dialogue(0, STR.NOTI_TITLE_ACCEPTED, STR.NOTI_CONTENT_ACCEPTED);
-				break;
-
-			case Packet.QUERY_RSRVS:
-				if(((ArrayList<Reservation>) packet.getData()).isEmpty()); // remove semicolon when implementing
-					// mainframe.dialogue(1, STR.NOTI_TITLE_NO_RESERVATION, STR.NOTI_CONTENT_NO_RESERVATION);
-				// mainframe.updateCalendar((ArrayList<Room>) packet.getData()[1]);
+                MainFrame.getInstance().unfreeze();
+                if((int)packet.getData() == 1) msg = STR.NOTI_NOT_REGISTERED_ROOM;
+                else if((int)packet.getData() == 2) msg = STR.NOTI_PASSED_DATE_CANCEL;
+                else if((int)packet.getData() == 3) msg = STR.NOTI_INVALID_FORM;
+                MainFrame.getInstance().showDialog(msg);
 				break;
 
 			case Packet.ACCEPT_REG:
@@ -211,16 +212,22 @@ public class PacketProcessor
                 LoginFrame.getInstance().setEnabled(true);
                 LoginFrame.getInstance().showDialog(STR.NOTI_INVALID_ACNT);
             }
-			// mainframe.dialogue(1, STR.NOTI_TITLE_INVALID_ACNT, STR.NOTI_CONTENT_INVALID_ACNT);
+            else
+            {
+                MainFrame.getInstance().unfreeze();
+                MainFrame.getInstance().showDialog(STR.NOTI_INVALID_ACNT);
+            }
 			break;
 
 		case Packet._INVALID_ACCESS:
-			// mainframe.dialogue(2, STR.NOTI_TITLE_INVALID_ACCESS, STR.NOTI_CONTENT_INVALID_ACCESS);
+            MainFrame.getInstance().unfreeze();
+            MainFrame.getInstance().showDialog(STR.NOTI_INVALID_ACCESS);
 			break;
 
 		case Packet._OUTDATED_VERSION:
-			// mainframe.dialogue(1, STR.NOTI_TITLE_OUTDATED_VERSION, 
-			//					STR.NOTI_CONTENT_OUTDATED_VERSION + (String)packet.getData());
+            LoginFrame.getInstance().setEnabled(true);
+			LoginFrame.getInstance().showDialog(STR.NOTI_OUTDATED_VERSION + 
+                                                (String)packet.getData());
 			break;
 
 		case Packet._SEARCH_PRI:
@@ -235,21 +242,12 @@ public class PacketProcessor
                 MainFrame.getInstance().showDialog(STR.NOTI_NO_RESULT);
             else MainFrame.getInstance().showDialog(STR.NOTI_SEC_RESULT);
 			break;
-			
-		case Packet._ACCEPTED:
-			// mainframe.dialogue(0, STR.NOTI_TITLE_ACCEPTED, STR.NOTI_CONTENT_ACCEPTED);
-			break;
-
-		case Packet._REJECTED:
-			// mainframe.dialogue(1, STR.NOTI_TITLE_REJECTED, (String) packet.getData());
-			break;
-			
+            
 		case Packet._UNKNOWN:
-			// mainframe.dialogue(1, STR.NOTI_TITLE_UNKNOWN, STR.NOTI_CONTENT_UNKNOWN);
-			break;
+            MainFrame.getInstance().unfreeze();
+            MainFrame.getInstance().showDialog(STR.NOTI_UNKNOWN);
 		}
 		
-		// mainframe.unblock(); // Unblock UI that is blocked not to get input.
 	}
 	
 	public void setContext(int context)

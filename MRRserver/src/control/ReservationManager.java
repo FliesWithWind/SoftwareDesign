@@ -58,7 +58,6 @@ public class ReservationManager
 		if(temp != null)							return 1; // check duplication
 		if(inf.getDate() < DateTeller.getToday())	return 2; // check if passed date
 		if(!validateReservationForm(inf)) 			return 3; // check if valid form
-		if(inf.getDate() < DateTeller.getToday())	return 4; // check if passed date
 
 		inf.setReqcancel(false);			// set reqcancel to be false
 		inf.setRoom(room);					// set room object

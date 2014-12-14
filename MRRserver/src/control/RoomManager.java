@@ -115,12 +115,16 @@ public class RoomManager
 		targetlist = searchByMaxcapacity	(targetlist, reservationinf.getRoom().getMaxcapacity());
 		targetlist = searchByRentcost		(targetlist, reservationinf.getRentcost());
 		targetlist = searchByCity			(targetlist, reservationinf.getRoom().getCity());
-		targetlist = searchByAvailability	(targetlist, reservationinf.getClient() == null);
+		targetlist = searchByAvailability	(targetlist, reservationinf.isReserved());
 		
-		targetlist = (ArrayList<Room>) targetlist.clone();
 		for(Room iter : targetlist)
 		{
-			iter.setOwner(null);
+			iter = (Room)iter.clone();
+			iter.getOwner().setId("");
+			iter.getOwner().setPw("");
+			iter.getOwner().setMyreservations(null);
+			iter.getOwner().setMyrooms(null);
+			iter.getOwner().setType(0);
 			iter.setReservations(null);
 		}
 		return targetlist;
@@ -130,7 +134,7 @@ public class RoomManager
 	// search by date performs with around interval (DATE_AROUND_INTERVAL)
 	// found		: returns searched list
 	// not found	: returns zero length list
-	public ArrayList<Room> secondarySearch(Reservation reservationinf)
+	public ArrayList<Room> secondarySearch(Reservation reservationinf) throws Exception
 	{
 		ArrayList<Room> targetlist = list;
 		ArrayList<Room> templist;
@@ -140,12 +144,16 @@ public class RoomManager
 		targetlist = searchByMaxcapacity	(targetlist, reservationinf.getRoom().getMaxcapacity());
 		targetlist = searchByRentcost		(targetlist, reservationinf.getRentcost());
 		targetlist = searchByCity			(targetlist, reservationinf.getRoom().getCity());
-		targetlist = searchByAvailability	(targetlist, reservationinf.getClient() == null);
+		targetlist = searchByAvailability	(targetlist, reservationinf.isReserved());
 		
-		targetlist = (ArrayList<Room>) targetlist.clone();
 		for(Room iter : targetlist)
 		{
-			iter.setOwner(null);
+			iter = (Room)iter.clone();
+			iter.getOwner().setId("");
+			iter.getOwner().setPw("");
+			iter.getOwner().setMyreservations(null);
+			iter.getOwner().setMyrooms(null);
+			iter.getOwner().setType(0);
 			iter.setReservations(null);
 		}
 		

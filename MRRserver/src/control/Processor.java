@@ -213,15 +213,13 @@ public class Processor
 			// send reservations of the room
 			temprsrvl = new ArrayList<Reservation>();
 			for(Reservation iter : temproom.getReservations())
-				if(	iter.getDate() >= temprsrv.getDate() - 31 && 
-					iter.getDate() <= temprsrv.getDate() + 31)
-				{
-					Reservation element = (Reservation) iter.clone();
-					element.setClient(null);
-					element.getRoom().setOwner(null);
-					element.getRoom().setReservations(null);
-					temprsrvl.add(element);
-				}
+			{
+				Reservation element = (Reservation) iter.clone();
+				element.setClient(null);
+				element.getRoom().setOwner(null);
+				element.getRoom().setReservations(null);
+				temprsrvl.add(element);
+			}
 			return new Packet(Packet._ACCEPTED, null, null, temprsrvl);	
 			
 		case Packet.CLOSE_RSRV:
@@ -232,18 +230,16 @@ public class Processor
 				return new Packet(Packet._INVALID_ACCESS, null, null, null);
 			result = reservationmanager.closeReservation(temprsrv);
 			if(result != 0) return new Packet(Packet._REJECTED, null, null, result);
-			// send reservations of the room
+			// send reservations of the room\
 			temprsrvl = new ArrayList<Reservation>();
 			for(Reservation iter : temproom.getReservations())
-				if(	iter.getDate() >= temprsrv.getDate() - 31 && 
-					iter.getDate() <= temprsrv.getDate() + 31)
-				{
-					Reservation element = (Reservation) iter.clone();
-					element.setClient(null);
-					element.getRoom().setOwner(null);
-					element.getRoom().setReservations(null);
-					temprsrvl.add(element);
-				}
+			{
+				Reservation element = (Reservation) iter.clone();
+				element.setClient(null);
+				element.getRoom().setOwner(null);
+				element.getRoom().setReservations(null);
+				temprsrvl.add(element);
+			}
 			return new Packet(Packet._ACCEPTED, null, null, temprsrvl);	
 			
 		case Packet.CANCEL_RSRV:
@@ -257,15 +253,13 @@ public class Processor
 			// send reservations of the room
 			temprsrvl = new ArrayList<Reservation>();
 			for(Reservation iter : temproom.getReservations())
-				if(	iter.getDate() >= temprsrv.getDate() - 31 && 
-					iter.getDate() <= temprsrv.getDate() + 31)
-				{
-					Reservation element = (Reservation) iter.clone();
-					element.setClient(null);
-					element.getRoom().setOwner(null);
-					element.getRoom().setReservations(null);
-					temprsrvl.add(element);
-				}
+			{
+				Reservation element = (Reservation) iter.clone();
+				element.setClient(null);
+				element.getRoom().setOwner(null);
+				element.getRoom().setReservations(null);
+				temprsrvl.add(element);
+			}
 			return new Packet(Packet._ACCEPTED, null, null, temprsrvl);	
 			
 		case Packet.SEARCH_ROOMS:
